@@ -111,29 +111,26 @@ export default function SettingsPage() {
           </div>
         )}
 
-        <form onSubmit={handleAddProvider} className="space-y-2">
-          <div className="grid grid-cols-2 gap-2">
-            <input
-              value={providerName}
-              onChange={e => setProviderName(e.target.value)}
-              placeholder="Name"
-              className="bg-muted/50 rounded-xl px-3 py-2.5 text-sm focus:ring-1 focus:ring-primary/30 focus:outline-none"
-            />
-            <input
-              value={providerSpecialty}
-              onChange={e => setProviderSpecialty(e.target.value)}
-              placeholder="Specialty"
-              className="bg-muted/50 rounded-xl px-3 py-2.5 text-sm focus:ring-1 focus:ring-primary/30 focus:outline-none"
-            />
-          </div>
+        <form onSubmit={handleAddProvider} className="flex gap-2">
+          <input
+            value={providerName}
+            onChange={e => setProviderName(e.target.value)}
+            placeholder="Name"
+            className="flex-1 bg-muted/50 rounded-xl px-3 py-2 text-sm focus:ring-1 focus:ring-primary/30 focus:outline-none"
+          />
+          <input
+            value={providerSpecialty}
+            onChange={e => setProviderSpecialty(e.target.value)}
+            placeholder="Specialty"
+            className="flex-1 bg-muted/50 rounded-xl px-3 py-2 text-sm focus:ring-1 focus:ring-primary/30 focus:outline-none"
+          />
           <button
             type="submit"
             disabled={!providerName.trim() || !providerSpecialty.trim()}
-            className="w-full bg-primary text-primary-foreground rounded-xl py-2.5 text-sm font-medium disabled:opacity-40"
+            className="p-2 rounded-xl bg-primary text-primary-foreground disabled:opacity-40"
             aria-label="Add provider"
           >
-            <Plus className="w-4 h-4 inline mr-1" />
-            Add provider
+            <Plus className="w-4 h-4" />
           </button>
         </form>
         {data.providers.length === 0 && (
