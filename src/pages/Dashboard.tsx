@@ -57,6 +57,14 @@ export default function Dashboard() {
         lastCheckIn={yesterdayCheckIn}
       />
 
+      {/* Weekly Summary */}
+      <WeeklySummary
+        checkIns={data.checkIns}
+        symptoms={data.symptoms}
+        activeMedications={data.activeMedications}
+        compliance={data.compliance}
+      />
+
       {/* Med Compliance Quick */}
       {data.activeMedications.length > 0 && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
