@@ -35,16 +35,19 @@ export default function Landing() {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
       } else {
-        const { error } = await supabase.auth.signUp({
+        const { data: signUpData, error } = await supabase.auth.signUp({
           email,
           password,
           options: { emailRedirectTo: window.location.origin },
         });
         if (error) throw error;
-        toast({
-          title: 'Check your email',
-          description: 'We sent you a confirmation link to complete sign-up.',
-        });
+        // If session exists, user is auto-confirmed — redirect will happen via auth state
+        if (!signUpData.session) {
+          toast({
+            title: 'Check your email',
+            description: 'We sent you a confirmation link to complete sign-up.',
+          });
+        }
       }
     } catch (err: any) {
       toast({
