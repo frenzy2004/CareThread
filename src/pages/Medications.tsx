@@ -98,6 +98,7 @@ export default function Medications() {
               todayCompliance={tc}
               onToggleCompliance={(taken) => data.toggleCompliance(med.id, taken)}
               onRate={(rating) => data.addEffectRating(med.id, rating)}
+              onDelete={() => data.deleteMedication(med.id)}
               showEffectRating={daysSince >= 7}
             />
           );
