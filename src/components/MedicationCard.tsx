@@ -43,6 +43,15 @@ export function MedicationCard({
         >
           {todayCompliance?.taken ? <Check className="w-4 h-4" /> : <X className="w-3.5 h-3.5 opacity-40" />}
         </button>
+        {onDelete && (
+          <button
+            onClick={onDelete}
+            className="p-1.5 rounded-lg text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10 transition-colors"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
+        )}
+        </div>
       </div>
 
       {showEffectRating && (
