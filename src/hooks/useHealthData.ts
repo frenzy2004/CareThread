@@ -132,8 +132,8 @@ export function useHealthData() {
 
   return {
     checkIns, addCheckIn, todayCheckIn, streak,
-    symptoms, addSymptom, lastSymptom,
-    medications, activeMedications, addMedication, updateMedication,
+    symptoms, addSymptom, deleteSymptom, lastSymptom,
+    medications, activeMedications, addMedication, updateMedication, deleteMedication,
     effectRatings, addEffectRating,
     compliance, toggleCompliance, todayCompliance,
     providers, addProvider,
