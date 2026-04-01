@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, X, Repeat } from 'lucide-react';
+import { Plus, X, Repeat, BarChart3, List } from 'lucide-react';
+import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { useHealthData } from '@/hooks/useHealthData';
 import { EmptyState } from '@/components/EmptyState';
-import { COMMON_SYMPTOMS, BODY_AREAS, MOOD_EMOJIS } from '@/types/health';
+import { COMMON_SYMPTOMS, BODY_AREAS } from '@/types/health';
 
 export default function Symptoms() {
   const { symptoms, addSymptom, lastSymptom } = useHealthData();
@@ -13,6 +14,7 @@ export default function Symptoms() {
   const [bodyArea, setBodyArea] = useState('');
   const [notes, setNotes] = useState('');
   const [filter, setFilter] = useState('');
+  const [view, setView] = useState<'list' | 'trends'>('list');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,6 +32,36 @@ export default function Symptoms() {
   const filtered = filter
     ? symptoms.filter(s => s.name.toLowerCase().includes(filter.toLowerCase()))
     : symptoms;
+
+  // Trend data: average severity per day over last 14 days
+  const severityTrend = useMemo(() => {
+    const days: Record<string, { total: number; count: number }> = {};
+    const now = Date.now();
+    const cutoff = now - 14 * 24 * 60 * 60 * 1000;
+    symptoms.filter(s => s.timestamp >= cutoff).forEach(s => {
+      const day = new Date(s.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      if (!days[day]) days[day] = { total: 0, count: 0 };
+      days[day].total += s.severity;
+      days[day].count++;
+    });
+    return Object.entries(days).map(([day, d]) => ({
+      day,
+      avg: Math.round((d.total / d.count) * 10) / 10,
+      count: d.count,
+    })).reverse();
+  }, [symptoms]);
+
+  // Top 5 symptoms by frequency
+  const frequencyData = useMemo(() => {
+    const counts: Record<string, number> = {};
+    symptoms.forEach(s => { counts[s.name] = (counts[s.name] || 0) + 1; });
+    return Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([name, count]) => ({ name, count }));
+  }, [symptoms]);
+
+  const hasTrendData = symptoms.length >= 3;
 
   if (symptoms.length === 0 && !showForm) {
     return (
@@ -56,6 +88,22 @@ export default function Symptoms() {
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-xl font-bold text-foreground">Symptoms</h1>
         <div className="flex gap-2">
+          {hasTrendData && (
+            <div className="flex bg-muted rounded-xl p-0.5">
+              <button
+                onClick={() => setView('list')}
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${view === 'list' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground'}`}
+              >
+                <List className="w-3 h-3" /> List
+              </button>
+              <button
+                onClick={() => setView('trends')}
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${view === 'trends' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground'}`}
+              >
+                <BarChart3 className="w-3 h-3" /> Trends
+              </button>
+            </div>
+          )}
           {lastSymptom && (
             <button onClick={repeatLast} className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-accent text-xs font-medium text-accent-foreground hover:bg-accent/80">
               <Repeat className="w-3 h-3" /> Repeat last
@@ -122,8 +170,51 @@ export default function Symptoms() {
         </motion.div>
       )}
 
-      {/* Search */}
-      {symptoms.length > 3 && (
+      {/* Trends View */}
+      {view === 'trends' && hasTrendData && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4 mb-4">
+          {/* Severity over time */}
+          <div className="bg-card rounded-2xl border border-border p-4">
+            <h3 className="text-sm font-semibold text-foreground mb-3">Avg Severity (14 days)</h3>
+            <ResponsiveContainer width="100%" height={160}>
+              <AreaChart data={severityTrend}>
+                <defs>
+                  <linearGradient id="severityGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="hsl(18, 52%, 53%)" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="hsl(18, 52%, 53%)" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(28, 35%, 85%)" />
+                <XAxis dataKey="day" tick={{ fontSize: 10, fill: 'hsl(10, 10%, 45%)' }} />
+                <YAxis domain={[0, 5]} tick={{ fontSize: 10, fill: 'hsl(10, 10%, 45%)' }} />
+                <Tooltip
+                  contentStyle={{ borderRadius: '12px', border: '1px solid hsl(28, 35%, 85%)', fontSize: '12px' }}
+                  formatter={(value: number) => [value, 'Avg severity']}
+                />
+                <Area type="monotone" dataKey="avg" stroke="hsl(18, 52%, 53%)" fill="url(#severityGrad)" strokeWidth={2} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Top symptoms frequency */}
+          <div className="bg-card rounded-2xl border border-border p-4">
+            <h3 className="text-sm font-semibold text-foreground mb-3">Most Logged Symptoms</h3>
+            <ResponsiveContainer width="100%" height={frequencyData.length * 36 + 10}>
+              <BarChart data={frequencyData} layout="vertical" margin={{ left: 0, right: 16 }}>
+                <XAxis type="number" tick={{ fontSize: 10, fill: 'hsl(10, 10%, 45%)' }} />
+                <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: 'hsl(10, 20%, 18%)' }} width={100} />
+                <Tooltip
+                  contentStyle={{ borderRadius: '12px', border: '1px solid hsl(28, 35%, 85%)', fontSize: '12px' }}
+                />
+                <Bar dataKey="count" fill="hsl(140, 15%, 55%)" radius={[0, 6, 6, 0]} barSize={20} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Search (list view only) */}
+      {view === 'list' && symptoms.length > 3 && (
         <input
           value={filter}
           onChange={e => setFilter(e.target.value)}
@@ -133,32 +224,34 @@ export default function Symptoms() {
       )}
 
       {/* List */}
-      <div className="space-y-2">
-        {filtered.map(s => (
-          <motion.div
-            key={s.id}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="bg-card rounded-xl border border-border p-3"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <span className="text-sm font-medium text-foreground">{s.name}</span>
-                {s.bodyArea && <span className="text-xs text-muted-foreground ml-2">{s.bodyArea}</span>}
+      {view === 'list' && (
+        <div className="space-y-2">
+          {filtered.map(s => (
+            <motion.div
+              key={s.id}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="bg-card rounded-xl border border-border p-3"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-sm font-medium text-foreground">{s.name}</span>
+                  {s.bodyArea && <span className="text-xs text-muted-foreground ml-2">{s.bodyArea}</span>}
+                </div>
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <div key={i} className={`w-1.5 h-1.5 rounded-full ${i < s.severity ? `severity-${s.severity}` : 'bg-muted'}`} />
+                  ))}
+                </div>
               </div>
-              <div className="flex items-center gap-1">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <div key={i} className={`w-1.5 h-1.5 rounded-full ${i < s.severity ? `severity-${s.severity}` : 'bg-muted'}`} />
-                ))}
-              </div>
-            </div>
-            {s.notes && <p className="text-xs text-muted-foreground mt-1">{s.notes}</p>}
-            <time className="text-[10px] text-muted-foreground/60 mt-1 block">
-              {new Date(s.timestamp).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
-            </time>
-          </motion.div>
-        ))}
-      </div>
+              {s.notes && <p className="text-xs text-muted-foreground mt-1">{s.notes}</p>}
+              <time className="text-[10px] text-muted-foreground/60 mt-1 block">
+                {new Date(s.timestamp).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
+              </time>
+            </motion.div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
