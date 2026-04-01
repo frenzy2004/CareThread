@@ -18,7 +18,7 @@ const RATING_ICON = {
 };
 
 export function MedicationCard({
-  medication, ratings, todayCompliance, onToggleCompliance, onRate, showEffectRating,
+  medication, ratings, todayCompliance, onToggleCompliance, onRate, onDelete, showEffectRating,
 }: MedicationCardProps) {
   const latestRating = ratings.filter(r => r.medicationId === medication.id)[0];
 
