@@ -60,14 +60,14 @@ export interface Insight {
   generatedAt: number;
 }
 
-export type MoodEmoji = { value: 1 | 2 | 3 | 4 | 5; emoji: string; label: string };
+export type MoodEmoji = { value: 1 | 2 | 3 | 4 | 5; emoji: string; activeEmoji: string; label: string };
 
 export const MOOD_EMOJIS: MoodEmoji[] = [
-  { value: 1, emoji: '😔', label: 'Rough' },
-  { value: 2, emoji: '😕', label: 'Not great' },
-  { value: 3, emoji: '😐', label: 'Okay' },
-  { value: 4, emoji: '🙂', label: 'Good' },
-  { value: 5, emoji: '😊', label: 'Great' },
+  { value: 1, emoji: '😔', activeEmoji: '😣', label: 'Rough' },
+  { value: 2, emoji: '😕', activeEmoji: '😟', label: 'Not great' },
+  { value: 3, emoji: '😐', activeEmoji: '🙂', label: 'Okay' },
+  { value: 4, emoji: '🙂', activeEmoji: '😄', label: 'Good' },
+  { value: 5, emoji: '😊', activeEmoji: '🤩', label: 'Great' },
 ];
 
 export const BODY_AREAS = [

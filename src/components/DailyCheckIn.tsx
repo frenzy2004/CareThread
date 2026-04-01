@@ -99,31 +99,34 @@ export function DailyCheckIn({ todayCheckIn, streak, onCheckIn, lastCheckIn }: D
       <h2 className="text-lg font-semibold text-foreground mb-4">How are you feeling today?</h2>
 
       <div className="flex justify-between mb-4">
-        {MOOD_EMOJIS.map(({ value, emoji, label }) => (
-          <motion.button
-            key={value}
-            onClick={() => setSelectedMood(value)}
-            whileTap={{ scale: 0.85 }}
-            animate={{ scale: selectedMood === value ? 1.15 : 1 }}
-            transition={{ type: "spring", stiffness: 400, damping: 12 }}
-            className={`flex flex-col items-center gap-1 p-2.5 rounded-xl ${
-              selectedMood === value
-                ? 'bg-primary/10 ring-2 ring-primary/30'
-                : 'hover:bg-accent'
-            }`}
-          >
-            <motion.span
-              key={selectedMood === value ? 'selected' : 'idle'}
-              initial={{ rotate: 0 }}
-              animate={{ rotate: selectedMood === value ? [0, -8, 8, -4, 0] : 0 }}
-              transition={{ duration: 0.4 }}
-              className="text-2xl"
+        {MOOD_EMOJIS.map(({ value, emoji, activeEmoji, label }) => {
+          const isSelected = selectedMood === value;
+          return (
+            <motion.button
+              key={value}
+              onClick={() => setSelectedMood(value)}
+              whileTap={{ scale: 0.85 }}
+              animate={{ scale: isSelected ? 1.15 : 1 }}
+              transition={{ type: "spring", stiffness: 400, damping: 12 }}
+              className={`flex flex-col items-center gap-1 p-2.5 rounded-xl ${
+                isSelected
+                  ? 'bg-primary/10 ring-2 ring-primary/30'
+                  : 'hover:bg-accent'
+              }`}
             >
-              {emoji}
-            </motion.span>
-            <span className="text-[10px] text-muted-foreground">{label}</span>
-          </motion.button>
-        ))}
+              <motion.span
+                key={isSelected ? 'selected' : 'idle'}
+                initial={{ rotate: 0 }}
+                animate={{ rotate: isSelected ? [0, -8, 8, -4, 0] : 0 }}
+                transition={{ duration: 0.4 }}
+                className="text-2xl"
+              >
+                {isSelected ? activeEmoji : emoji}
+              </motion.span>
+              <span className="text-[10px] text-muted-foreground">{label}</span>
+            </motion.button>
+          );
+        })}
       </div>
 
       <textarea
