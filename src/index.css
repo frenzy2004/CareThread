@@ -2,95 +2,112 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
-
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* CareThread — Warm & Human palette */
+    --background: 30 50% 97%; /* cream #FDF6EE */
+    --foreground: 10 20% 18%; /* warm dark #3D2C2C */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 30 40% 98%;
+    --card-foreground: 10 20% 18%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 10 20% 18%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 18 52% 53%; /* terracotta #C4704B */
+    --primary-foreground: 30 50% 97%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 140 15% 55%; /* sage #7C9A82 */
+    --secondary-foreground: 30 50% 97%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 28 35% 90%; /* light clay */
+    --muted-foreground: 10 10% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 28 45% 88%; /* clay borders #E8D5C4 */
+    --accent-foreground: 10 20% 18%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 15 65% 48%;
+    --destructive-foreground: 30 50% 97%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 28 35% 85%;
+    --input: 28 30% 88%;
+    --ring: 18 52% 53%;
 
-    --radius: 0.5rem;
+    --radius: 1rem;
 
-    --sidebar-background: 0 0% 98%;
+    /* Severity warm spectrum */
+    --severity-1: 45 80% 70%; /* pale gold */
+    --severity-2: 38 75% 58%; /* amber */
+    --severity-3: 25 70% 50%; /* burnt orange */
+    --severity-4: 15 60% 42%; /* deep clay */
+    --severity-5: 18 52% 35%; /* dark terracotta */
 
-    --sidebar-foreground: 240 5.3% 26.1%;
+    /* Semantic extras */
+    --sage: 140 15% 55%;
+    --sage-light: 140 18% 92%;
+    --terracotta-light: 18 60% 92%;
+    --cream-dark: 30 30% 92%;
+    --warm-glow: 30 60% 95%;
 
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 30 40% 96%;
+    --sidebar-foreground: 10 20% 18%;
+    --sidebar-primary: 18 52% 53%;
+    --sidebar-primary-foreground: 30 50% 97%;
+    --sidebar-accent: 28 45% 88%;
+    --sidebar-accent-foreground: 10 20% 18%;
+    --sidebar-border: 28 35% 85%;
+    --sidebar-ring: 18 52% 53%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 10 15% 10%;
+    --foreground: 30 30% 90%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 10 12% 14%;
+    --card-foreground: 30 30% 90%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 10 12% 14%;
+    --popover-foreground: 30 30% 90%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 18 52% 58%;
+    --primary-foreground: 10 15% 10%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 140 15% 40%;
+    --secondary-foreground: 30 30% 90%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 10 10% 20%;
+    --muted-foreground: 30 15% 60%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 10 12% 20%;
+    --accent-foreground: 30 30% 90%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 15 60% 40%;
+    --destructive-foreground: 30 30% 90%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --border: 10 10% 22%;
+    --input: 10 10% 22%;
+    --ring: 18 52% 58%;
+
+    --severity-1: 45 60% 55%;
+    --severity-2: 38 55% 48%;
+    --severity-3: 25 55% 42%;
+    --severity-4: 15 45% 35%;
+    --severity-5: 18 40% 28%;
+
+    --sage: 140 15% 40%;
+    --sage-light: 140 10% 18%;
+    --terracotta-light: 18 30% 18%;
+    --cream-dark: 30 10% 16%;
+    --warm-glow: 10 12% 14%;
+
+    --sidebar-background: 10 12% 12%;
+    --sidebar-foreground: 30 30% 90%;
+    --sidebar-primary: 18 52% 58%;
+    --sidebar-primary-foreground: 10 15% 10%;
+    --sidebar-accent: 10 12% 20%;
+    --sidebar-accent-foreground: 30 30% 90%;
+    --sidebar-border: 10 10% 22%;
+    --sidebar-ring: 18 52% 58%;
   }
 }
 
@@ -101,5 +118,14 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
+}
+
+@layer utilities {
+  .severity-1 { background-color: hsl(var(--severity-1)); }
+  .severity-2 { background-color: hsl(var(--severity-2)); }
+  .severity-3 { background-color: hsl(var(--severity-3)); }
+  .severity-4 { background-color: hsl(var(--severity-4)); }
+  .severity-5 { background-color: hsl(var(--severity-5)); }
 }
