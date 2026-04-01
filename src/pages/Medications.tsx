@@ -46,7 +46,7 @@ export default function Medications() {
   }
 
   return (
-    <div className="p-4 max-w-lg mx-auto pb-24">
+    <div className="p-4 max-w-lg mx-auto pb-[calc(6rem+env(safe-area-inset-bottom))]">
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-xl font-bold text-foreground">Medications</h1>
         <button onClick={() => setShowForm(true)} className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-primary text-primary-foreground text-xs font-medium">
