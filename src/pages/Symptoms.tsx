@@ -8,7 +8,7 @@ import { COMMON_SYMPTOMS, BODY_AREAS } from '@/types/health';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 
 export default function Symptoms() {
-  const { symptoms, addSymptom, lastSymptom } = useHealthData();
+  const { symptoms, addSymptom, deleteSymptom, lastSymptom } = useHealthData();
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState('');
   const [severity, setSeverity] = useState<1|2|3|4|5>(3);
