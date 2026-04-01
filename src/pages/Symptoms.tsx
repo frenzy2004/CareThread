@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Repeat, BarChart3, List } from 'lucide-react';
+import { Plus, Repeat, BarChart3, List, Trash2 } from 'lucide-react';
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { useHealthData } from '@/hooks/useHealthData';
 import { EmptyState } from '@/components/EmptyState';
@@ -8,7 +8,7 @@ import { COMMON_SYMPTOMS, BODY_AREAS } from '@/types/health';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 
 export default function Symptoms() {
-  const { symptoms, addSymptom, lastSymptom } = useHealthData();
+  const { symptoms, addSymptom, deleteSymptom, lastSymptom } = useHealthData();
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState('');
   const [severity, setSeverity] = useState<1|2|3|4|5>(3);
@@ -236,14 +236,22 @@ export default function Symptoms() {
               className="bg-card rounded-xl border border-border p-3"
             >
               <div className="flex items-center justify-between">
-                <div>
+                <div className="flex-1 min-w-0">
                   <span className="text-sm font-medium text-foreground">{s.name}</span>
                   {s.bodyArea && <span className="text-xs text-muted-foreground ml-2">{s.bodyArea}</span>}
                 </div>
-                <div className="flex items-center gap-1">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <div key={i} className={`w-1.5 h-1.5 rounded-full ${i < s.severity ? `severity-${s.severity}` : 'bg-muted'}`} />
-                  ))}
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <div key={i} className={`w-1.5 h-1.5 rounded-full ${i < s.severity ? `severity-${s.severity}` : 'bg-muted'}`} />
+                    ))}
+                  </div>
+                  <button
+                    onClick={() => deleteSymptom(s.id)}
+                    className="p-1.5 rounded-lg text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10 transition-colors"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               </div>
               {s.notes && <p className="text-xs text-muted-foreground mt-1">{s.notes}</p>}

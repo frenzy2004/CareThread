@@ -1,4 +1,4 @@
-import { Check, X, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { Check, X, TrendingUp, TrendingDown, Minus, Trash2 } from 'lucide-react';
 import type { Medication, MedEffectRating, MedCompliance } from '@/types/health';
 
 interface MedicationCardProps {
@@ -7,6 +7,7 @@ interface MedicationCardProps {
   todayCompliance?: MedCompliance;
   onToggleCompliance: (taken: boolean) => void;
   onRate: (rating: MedEffectRating['rating']) => void;
+  onDelete?: () => void;
   showEffectRating?: boolean;
 }
 
@@ -17,20 +18,21 @@ const RATING_ICON = {
 };
 
 export function MedicationCard({
-  medication, ratings, todayCompliance, onToggleCompliance, onRate, showEffectRating,
+  medication, ratings, todayCompliance, onToggleCompliance, onRate, onDelete, showEffectRating,
 }: MedicationCardProps) {
   const latestRating = ratings.filter(r => r.medicationId === medication.id)[0];
 
   return (
     <div className="bg-card rounded-2xl border border-border p-4">
       <div className="flex items-start justify-between mb-2">
-        <div>
+        <div className="flex-1 min-w-0">
           <h3 className="font-semibold text-foreground text-sm">{medication.name}</h3>
           <p className="text-xs text-muted-foreground">{medication.dosage} · {medication.frequency}</p>
           {medication.drugClass && (
             <p className="text-xs text-muted-foreground/70 mt-0.5">{medication.drugClass}</p>
           )}
         </div>
+        <div className="flex items-center gap-1.5">
         <button
           onClick={() => onToggleCompliance(!(todayCompliance?.taken))}
           className={`w-8 h-8 rounded-xl flex items-center justify-center border transition-colors ${
@@ -41,6 +43,15 @@ export function MedicationCard({
         >
           {todayCompliance?.taken ? <Check className="w-4 h-4" /> : <X className="w-3.5 h-3.5 opacity-40" />}
         </button>
+        {onDelete && (
+          <button
+            onClick={onDelete}
+            className="p-1.5 rounded-lg text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10 transition-colors"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
+        )}
+        </div>
       </div>
 
       {showEffectRating && (
