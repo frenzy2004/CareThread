@@ -1,7 +1,9 @@
 import React, { useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Download, Upload, AlertCircle, Check, Plus, Trash2 } from 'lucide-react';
+import { Download, Upload, AlertCircle, Check, Plus, Trash2, LogOut } from 'lucide-react';
 import { useHealthDataContext } from '@/contexts/HealthDataContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { ExportPDF } from '@/components/ExportPDF';
 import { useToast } from '@/hooks/use-toast';
 
