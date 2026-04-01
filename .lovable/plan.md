@@ -1,39 +1,43 @@
 
 
-# Medication Section Polish — Final
+# PDF Export Improvements — Final
 
-No changes from the revised plan. User feedback confirms the approach and adds three refinements to incorporate:
+## Structure
 
-1. **Lightweight discontinue Drawer** — medication name, chips, text field only for "Other", single confirm button. No extra chrome.
-2. **Mutual exclusion** — `editingMed` and `discontinuingMed` clear each other when set.
-3. **Immediate visual result** — on discontinue confirm, close Drawer, med moves from active to past section instantly.
+Two-tier layout with a visual divider between tiers.
 
-All three are implementation details within the existing plan structure.
+**Header**
+- Existing colored banner
+- Add explicit generated date/time: "Generated on: 1 April 2026"
+- Add explicit date range: "Date range: 3 March 2026 – 1 April 2026"
 
----
+**Tier 1 — Summary**
+1. Mood overview + trend table (by day for 7d, by week for 14d/30d)
+2. Current Medications & Adherence (grouped as one story — meds table then adherence table with minimal gap)
+3. Symptom summary (aggregated counts)
 
-## Changes by file
+**— Subtle divider line + "Additional Context" label —**
 
-### `src/hooks/useHealthData.ts`
-- Add `discontinueMedication(id, reason?)` — sets `status: 'discontinued'`, `endDate: today()`, `discontinuationReason`
-- Export it in the return object
+**Tier 2 — Additional Context**
+4. Discontinued medications (name, dosage, end date, reason)
+5. Providers / Care Team
+6. Patient-Reported Medication Response (doctor) / How Meds Are Working (patient)
+7. Recent check-in notes (last 7 with notes, oldest→newest, truncate at ~200 chars)
+8. Recent symptom timeline (last 10, displayed oldest→newest, date/name/severity/body area/notes)
 
-### `src/components/MedicationCard.tsx`
-- Add `onEdit`, `onDiscontinue` props
-- Replace `X` icon with `Circle` for untaken compliance
-- Make name/details area a tappable button calling `onEdit`, add `ChevronRight` affordance
-- Wrap trash icon in `AlertDialog` — "Delete medication? This can't be undone. To preserve history, discontinue instead." Cancel / Delete
-- Add `Pause` icon button for discontinue (more prominent than trash)
+## Key details
 
-### `src/pages/Medications.tsx`
-- Add `editingMed` and `discontinuingMed` state, mutually exclusive (setting one clears the other)
-- **Edit mode**: open existing drawer pre-filled, submit calls `updateMedication`
-- **Discontinue Drawer**: med name header, reason chips (Side effects · Not helping · Doctor changed · Completed course · Other), text field appears only when "Other" selected, Confirm button → calls `discontinueMedication`, closes drawer
-- **Past meds section**: show Badge ("Discontinued"), end date, reason if provided
+- **Empty states**: neutral per section. Patient: "No symptoms were logged in this period." Doctor: "No symptom data recorded for this period."
+- **Note wrapping**: autoTable column styles with max width, truncate at ~200 chars with ellipsis
+- **Efficacy title**: Doctor → "Patient-Reported Medication Response", Patient → "How Meds Are Working"
+- **Tier divider**: thin line + small gray italic text "Additional Context" centered, between Tier 1 and Tier 2
+- **ExportPDF.tsx**: pass `providers`, disable button + inline message when zero total entries
+- **ExportData interface**: add `providers: Provider[]`
 
-| File | Summary |
+## Files
+
+| File | Changes |
 |------|---------|
-| `useHealthData.ts` | `discontinueMedication` function |
-| `MedicationCard.tsx` | `onEdit` + `onDiscontinue` props, AlertDialog, Circle icon, ChevronRight |
-| `Medications.tsx` | Edit + discontinue flows, mutual exclusion, enhanced past-med cards |
+| `src/lib/pdf-export.ts` | Header date/range, two-tier structure with divider, 4 new sections, mood trend, neutral empty states, note truncation, renamed efficacy heading |
+| `src/components/ExportPDF.tsx` | Pass providers, disable when no data with message |
 
