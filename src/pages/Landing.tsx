@@ -65,10 +65,10 @@ export default function Landing() {
       <div className="w-full max-w-sm">
         {/* Brand */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-foreground drop-shadow-sm">
+          <h1 className="text-3xl font-bold text-white drop-shadow-md">
             CareThread
           </h1>
-          <p className="text-sm text-muted-foreground mt-2 max-w-xs mx-auto">
+          <p className="text-sm text-white/70 mt-2 max-w-xs mx-auto">
             {mode === 'signup'
               ? 'Your health data stays private on your device. Create an account to access CareThread.'
               : 'Track symptoms, medications, and patterns across providers.'}
@@ -76,16 +76,16 @@ export default function Landing() {
         </div>
 
         {/* Auth card */}
-        <div className="bg-card/90 backdrop-blur-xl rounded-2xl border border-border/50 shadow-lg p-6">
+        <div className="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.3)] p-6">
           {/* Toggle */}
-          <div className="flex rounded-xl bg-muted/60 p-1 mb-6">
+          <div className="flex rounded-xl bg-white/10 p-1 mb-6">
             <button
               type="button"
               onClick={() => setMode('signin')}
               className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
                 mode === 'signin'
-                  ? 'bg-background text-foreground shadow-sm'
-                  : 'text-muted-foreground'
+                  ? 'bg-white/20 text-white shadow-sm'
+                  : 'text-white/50'
               }`}
             >
               Sign In
@@ -95,8 +95,8 @@ export default function Landing() {
               onClick={() => setMode('signup')}
               className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
                 mode === 'signup'
-                  ? 'bg-background text-foreground shadow-sm'
-                  : 'text-muted-foreground'
+                  ? 'bg-white/20 text-white shadow-sm'
+                  : 'text-white/50'
               }`}
             >
               Sign Up
@@ -105,7 +105,7 @@ export default function Landing() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-xs font-medium text-muted-foreground mb-1.5">
+              <label htmlFor="email" className="block text-xs font-medium text-white/60 mb-1.5">
                 Email
               </label>
               <input
@@ -115,13 +115,13 @@ export default function Landing() {
                 onChange={e => setEmail(e.target.value)}
                 required
                 autoComplete="email"
-                className="w-full bg-muted/50 rounded-xl px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-primary/30 focus:outline-none border border-border/30"
+                className="w-full bg-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder:text-white/30 focus:ring-2 focus:ring-white/20 focus:outline-none border border-white/10"
                 placeholder="you@example.com"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-xs font-medium text-muted-foreground mb-1.5">
+              <label htmlFor="password" className="block text-xs font-medium text-white/60 mb-1.5">
                 Password
               </label>
               <input
@@ -132,7 +132,7 @@ export default function Landing() {
                 required
                 autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
                 minLength={6}
-                className="w-full bg-muted/50 rounded-xl px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-primary/30 focus:outline-none border border-border/30"
+                className="w-full bg-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder:text-white/30 focus:ring-2 focus:ring-white/20 focus:outline-none border border-white/10"
                 placeholder="••••••••"
               />
             </div>
@@ -147,7 +147,7 @@ export default function Landing() {
           </form>
         </div>
 
-        <p className="text-center text-xs text-muted-foreground/70 mt-4">
+        <p className="text-center text-xs text-white/40 mt-4">
           All health data is stored locally on your device.
         </p>
       </div>
