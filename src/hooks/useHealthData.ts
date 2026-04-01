@@ -54,6 +54,10 @@ export function useHealthData() {
     setSymptoms(prev => prev.filter(s => s.id !== id));
   }, [setSymptoms]);
 
+  const updateSymptom = useCallback((id: string, updates: Partial<Omit<Symptom, 'id' | 'timestamp'>>) => {
+    setSymptoms(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
+  }, [setSymptoms]);
+
   const lastSymptom = useMemo(() => symptoms[0] || null, [symptoms]);
 
   // Medications
