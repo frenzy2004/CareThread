@@ -7,6 +7,7 @@ import { DailyCheckIn } from '@/components/DailyCheckIn';
 import { MedicationCard } from '@/components/MedicationCard';
 import { InsightCard, InsightPreview } from '@/components/InsightCard';
 import { EmptyState } from '@/components/EmptyState';
+import { WeeklySummary } from '@/components/WeeklySummary';
 import { MOOD_EMOJIS } from '@/types/health';
 import { useNavigate } from 'react-router-dom';
 
@@ -54,6 +55,14 @@ export default function Dashboard() {
         streak={data.streak}
         onCheckIn={data.addCheckIn}
         lastCheckIn={yesterdayCheckIn}
+      />
+
+      {/* Weekly Summary */}
+      <WeeklySummary
+        checkIns={data.checkIns}
+        symptoms={data.symptoms}
+        activeMedications={data.activeMedications}
+        compliance={data.compliance}
       />
 
       {/* Med Compliance Quick */}
