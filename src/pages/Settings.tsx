@@ -66,7 +66,7 @@ export default function SettingsPage() {
   const totalEntries = data.checkIns.length + data.symptoms.length + data.medications.length;
 
   return (
-    <div className="px-4 py-4 w-full max-w-lg mx-auto pb-[calc(6rem+env(safe-area-inset-bottom))] overflow-x-hidden">
+    <div className="px-4 py-4 max-w-lg mx-auto pb-[calc(6rem+env(safe-area-inset-bottom))] overflow-x-hidden box-border" style={{ maxWidth: 'min(32rem, 100%)' }}>
       <h1 className="text-xl font-bold text-foreground mb-6">Settings</h1>
 
       {/* Data overview */}
