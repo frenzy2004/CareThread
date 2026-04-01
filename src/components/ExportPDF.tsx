@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { FileText, Download } from 'lucide-react';
 import { useHealthData } from '@/hooks/useHealthData';
@@ -16,6 +16,15 @@ export function ExportPDF() {
   const [days, setDays] = useState(14);
   const [generating, setGenerating] = useState(false);
 
+  const hasData = useMemo(() => {
+    return (
+      data.checkIns.length > 0 ||
+      data.symptoms.length > 0 ||
+      data.medications.length > 0 ||
+      data.providers.length > 0
+    );
+  }, [data.checkIns, data.symptoms, data.medications, data.providers]);
+
   const handleGenerate = () => {
     setGenerating(true);
     setTimeout(() => {
@@ -26,6 +35,7 @@ export function ExportPDF() {
           medications: data.medications,
           compliance: data.compliance,
           effectRatings: data.effectRatings,
+          providers: data.providers,
         },
         mode,
         days
@@ -86,9 +96,15 @@ export function ExportPDF() {
         </div>
       </div>
 
+      {!hasData && (
+        <p className="text-xs text-muted-foreground text-center mb-3">
+          Start logging check-ins, symptoms, or medications to generate a report.
+        </p>
+      )}
+
       <button
         onClick={handleGenerate}
-        disabled={generating}
+        disabled={generating || !hasData}
         className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-xl py-2.5 text-sm font-medium disabled:opacity-50"
       >
         <Download className="w-4 h-4" />
