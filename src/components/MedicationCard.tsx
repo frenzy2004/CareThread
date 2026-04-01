@@ -1,4 +1,4 @@
-import { Check, X, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { Check, X, TrendingUp, TrendingDown, Minus, Trash2 } from 'lucide-react';
 import type { Medication, MedEffectRating, MedCompliance } from '@/types/health';
 
 interface MedicationCardProps {
@@ -7,6 +7,7 @@ interface MedicationCardProps {
   todayCompliance?: MedCompliance;
   onToggleCompliance: (taken: boolean) => void;
   onRate: (rating: MedEffectRating['rating']) => void;
+  onDelete?: () => void;
   showEffectRating?: boolean;
 }
 
