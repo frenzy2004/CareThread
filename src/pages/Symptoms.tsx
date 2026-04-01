@@ -1,10 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, X, Repeat, BarChart3, List } from 'lucide-react';
+import { Plus, Repeat, BarChart3, List } from 'lucide-react';
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { useHealthData } from '@/hooks/useHealthData';
 import { EmptyState } from '@/components/EmptyState';
 import { COMMON_SYMPTOMS, BODY_AREAS } from '@/types/health';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 
 export default function Symptoms() {
   const { symptoms, addSymptom, lastSymptom } = useHealthData();
