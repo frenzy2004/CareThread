@@ -19,14 +19,24 @@ export default function Landing() {
     : 'Track symptoms, medications, and patterns across providers.';
 
   useEffect(() => {
-    setDisplayedText('');
-    let i = 0;
-    const interval = setInterval(() => {
-      i++;
-      setDisplayedText(tagline.slice(0, i));
-      if (i >= tagline.length) clearInterval(interval);
-    }, 30);
-    return () => clearInterval(interval);
+    let timeout: ReturnType<typeof setTimeout>;
+    let interval: ReturnType<typeof setInterval>;
+
+    const runCycle = () => {
+      setDisplayedText('');
+      let i = 0;
+      interval = setInterval(() => {
+        i++;
+        setDisplayedText(tagline.slice(0, i));
+        if (i >= tagline.length) {
+          clearInterval(interval);
+          timeout = setTimeout(runCycle, 3000);
+        }
+      }, 30);
+    };
+
+    runCycle();
+    return () => { clearInterval(interval); clearTimeout(timeout); };
   }, [tagline]);
 
   if (loading) {
