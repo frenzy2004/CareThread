@@ -1,43 +1,61 @@
 
 
-# Weekly Summary Card — Final Refined Plan
+# Mobile Polish — Revised Plan
 
-## Component: `src/components/WeeklySummary.tsx`
+Incorporating your feedback: no global `html` safe-area padding. Each fixed/positioned element handles its own insets. Page wrappers handle bottom spacing.
 
-Warm "This week at a glance" card between Daily Check-in and Today's Medications. Shown when 2+ check-in days exist in the last 7.
+---
 
-### 2x2 grid + footer
+## 1. Viewport Meta
 
-| Check-ins | Avg Mood |
-|-----------|----------|
-| 5 of 7 days | 🙂 3.8 |
-| **Symptoms** | **Compliance** |
-| 12 symptoms logged | Took most doses |
-| ↗ Mood trending upward |
+**`index.html`** — Add `viewport-fit=cover` to the existing viewport meta tag. This enables `env(safe-area-inset-*)` values on iOS/Android.
 
-### Key refinements
+## 2. Bottom Nav — Own Inset Handling
 
-**Symptom wording**: Use `"{n} symptoms logged"` or `"{n} entries this week"` if zero symptoms — never just a bare number.
+**`src/components/BottomNav.tsx`** — Add `pb-[env(safe-area-inset-bottom)]` to the nav container. The nav already has `h-16`; the safe area padding extends below it so the home bar never overlaps buttons.
 
-**Compliance tiers** (fixed in code):
-- 100% → "Took all doses"
-- 80–99% → "Took most doses"
-- 40–79% → "Some doses missed"
-- <40% → "Several doses missed"
+## 3. Floating CTA — Own Inset Handling
 
-Denominator: only count days where `today >= med.startDate` within the 7-day window per active med.
+**`src/pages/Dashboard.tsx`** line 145 — Change `bottom-20` to `bottom-[calc(5.5rem+env(safe-area-inset-bottom))]`. Keep `md:bottom-6` for desktop. Using 5.5rem as a starting point (nav is 4rem + some breathing room). May need visual tuning after implementation.
 
-**Mood trend deadband** (±0.3):
-- diff > 0.3 → "Mood trending upward" ↗
-- diff < -0.3 → "Mood trending downward" ↘
-- otherwise → "Mood holding steady" →
+## 4. Page Container Bottom Padding
 
-Comparison: average mood of days 1–3 vs days 4–7 of the week.
+Update `pb-24` on each page wrapper to `pb-[calc(6rem+env(safe-area-inset-bottom))]` so content scrolls clear of the bottom nav + safe area:
 
-### Visibility
-Hidden when <2 check-in days in the last 7.
+- `src/pages/Dashboard.tsx` line 51
+- `src/pages/Symptoms.tsx` — page container
+- `src/pages/Medications.tsx` — page container
+- `src/pages/Timeline.tsx` — page container
+- `src/pages/Settings.tsx` — page container
 
-## Files
-- **New**: `src/components/WeeklySummary.tsx`
-- **Modified**: `src/pages/Dashboard.tsx` — render after DailyCheckIn, pass health data props
+## 5. Bottom Sheet Drawers for Forms
+
+**`src/pages/Symptoms.tsx`**:
+- Import `Drawer, DrawerContent, DrawerHeader, DrawerTitle` from `@/components/ui/drawer`
+- Replace the inline `showForm && <motion.div>` card with `<Drawer open={showForm} onOpenChange={setShowForm}>`
+- Move the form markup into `<DrawerContent>` with a scrollable inner container (`overflow-y-auto max-h-[85vh]`) to handle keyboard-open scenarios
+- Keep form logic identical
+
+**`src/pages/Medications.tsx`**:
+- Same pattern: wrap the "Add Medication" form in a `<Drawer>` bottom sheet
+- Scrollable content area for when keyboard pushes content up
+
+### Drawer content guidelines
+- `max-h-[85vh]` with `overflow-y-auto` on the form wrapper inside DrawerContent — prevents full-screen takeover and handles keyboard visibility
+- Compact internal spacing (`space-y-3`, `p-4`)
+- No changes to form fields or validation logic
+
+## Files Modified
+
+| File | Change |
+|------|--------|
+| `index.html` | Add `viewport-fit=cover` to meta |
+| `src/components/BottomNav.tsx` | Safe area bottom padding on nav |
+| `src/pages/Dashboard.tsx` | CTA inset fix + page pb |
+| `src/pages/Symptoms.tsx` | Drawer form + page pb |
+| `src/pages/Medications.tsx` | Drawer form + page pb |
+| `src/pages/Timeline.tsx` | Page pb |
+| `src/pages/Settings.tsx` | Page pb |
+
+No new dependencies. No global CSS changes. Each element owns its own safe-area spacing.
 
