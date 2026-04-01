@@ -100,18 +100,29 @@ export function DailyCheckIn({ todayCheckIn, streak, onCheckIn, lastCheckIn }: D
 
       <div className="flex justify-between mb-4">
         {MOOD_EMOJIS.map(({ value, emoji, label }) => (
-          <button
+          <motion.button
             key={value}
             onClick={() => setSelectedMood(value)}
-            className={`flex flex-col items-center gap-1 p-2.5 rounded-xl transition-all ${
+            whileTap={{ scale: 0.85 }}
+            animate={{ scale: selectedMood === value ? 1.15 : 1 }}
+            transition={{ type: "spring", stiffness: 400, damping: 12 }}
+            className={`flex flex-col items-center gap-1 p-2.5 rounded-xl ${
               selectedMood === value
-                ? 'bg-primary/10 scale-110 ring-2 ring-primary/30'
+                ? 'bg-primary/10 ring-2 ring-primary/30'
                 : 'hover:bg-accent'
             }`}
           >
-            <span className="text-2xl">{emoji}</span>
+            <motion.span
+              key={selectedMood === value ? 'selected' : 'idle'}
+              initial={{ rotate: 0 }}
+              animate={{ rotate: selectedMood === value ? [0, -8, 8, -4, 0] : 0 }}
+              transition={{ duration: 0.4 }}
+              className="text-2xl"
+            >
+              {emoji}
+            </motion.span>
             <span className="text-[10px] text-muted-foreground">{label}</span>
-          </button>
+          </motion.button>
         ))}
       </div>
 
