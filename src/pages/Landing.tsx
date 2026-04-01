@@ -76,7 +76,7 @@ export default function Landing() {
         </div>
 
         {/* Auth card */}
-        <div className="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.3)] p-6">
+        <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.2)] p-6">
           {/* Toggle */}
           <div className="flex rounded-xl bg-white/10 p-1 mb-6">
             <button
