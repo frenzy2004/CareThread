@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Repeat, BarChart3, List } from 'lucide-react';
+import { Plus, Repeat, BarChart3, List, Trash2 } from 'lucide-react';
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { useHealthData } from '@/hooks/useHealthData';
 import { EmptyState } from '@/components/EmptyState';
