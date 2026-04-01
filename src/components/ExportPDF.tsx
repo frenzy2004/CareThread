@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { FileText, Download } from 'lucide-react';
-import { useHealthData } from '@/hooks/useHealthData';
+import { useHealthDataContext } from '@/contexts/HealthDataContext';
 import { generatePDF } from '@/lib/pdf-export';
 
 const RANGE_OPTIONS = [
@@ -11,7 +11,7 @@ const RANGE_OPTIONS = [
 ];
 
 export function ExportPDF() {
-  const data = useHealthData();
+  const data = useHealthDataContext();
   const [mode, setMode] = useState<'patient' | 'doctor'>('patient');
   const [days, setDays] = useState(14);
   const [generating, setGenerating] = useState(false);

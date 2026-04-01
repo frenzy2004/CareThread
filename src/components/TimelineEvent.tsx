@@ -1,4 +1,5 @@
 import { Pill, Flame, Stethoscope, Check, TrendingUp, Calendar } from 'lucide-react';
+import { SEVERITY_BG } from '@/lib/constants';
 
 export type TimelineEventType = 'medication_start' | 'medication_stop' | 'symptom' | 'checkin' | 'compliance' | 'insight';
 
@@ -50,12 +51,12 @@ export function TimelineEvent({ event }: TimelineEventProps) {
           <p className="text-xs text-muted-foreground mt-0.5">{event.description}</p>
         )}
         {event.severity && (
-          <div className="flex items-center gap-1 mt-1.5">
+          <div className="flex items-center gap-1 mt-1.5" role="img" aria-label={`Severity ${event.severity} of 5`}>
             {Array.from({ length: 5 }).map((_, i) => (
               <div
                 key={i}
                 className={`w-1.5 h-1.5 rounded-full ${
-                  i < event.severity! ? `severity-${event.severity}` : 'bg-muted'
+                  i < event.severity! ? SEVERITY_BG[event.severity!] : 'bg-muted'
                 }`}
               />
             ))}

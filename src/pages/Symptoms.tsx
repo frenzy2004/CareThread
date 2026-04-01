@@ -2,14 +2,17 @@ import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Repeat, BarChart3, List, Trash2 } from 'lucide-react';
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
-import { useHealthData } from '@/hooks/useHealthData';
+import { useHealthDataContext } from '@/contexts/HealthDataContext';
 import { EmptyState } from '@/components/EmptyState';
 import { COMMON_SYMPTOMS, BODY_AREAS } from '@/types/health';
+import { SEVERITY_BG } from '@/lib/constants';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
+import type { Symptom } from '@/types/health';
 
 export default function Symptoms() {
-  const { symptoms, addSymptom, deleteSymptom, lastSymptom } = useHealthData();
+  const { symptoms, addSymptom, updateSymptom, deleteSymptom, lastSymptom } = useHealthDataContext();
   const [showForm, setShowForm] = useState(false);
+  const [editingSymptom, setEditingSymptom] = useState<Symptom | null>(null);
   const [name, setName] = useState('');
   const [severity, setSeverity] = useState<1|2|3|4|5>(3);
   const [bodyArea, setBodyArea] = useState('');
@@ -17,12 +20,47 @@ export default function Symptoms() {
   const [filter, setFilter] = useState('');
   const [view, setView] = useState<'list' | 'trends'>('list');
 
+  const isEditing = !!editingSymptom;
+  const formOpen = showForm || isEditing;
+
+  const openAdd = () => {
+    setEditingSymptom(null);
+    setName(''); setSeverity(3); setBodyArea(''); setNotes('');
+    setShowForm(true);
+  };
+
+  const openEdit = (s: Symptom) => {
+    setEditingSymptom(s);
+    setName(s.name);
+    setSeverity(s.severity);
+    setBodyArea(s.bodyArea || '');
+    setNotes(s.notes || '');
+    setShowForm(true);
+  };
+
+  const closeForm = (open: boolean) => {
+    if (!open) {
+      setShowForm(false);
+      setEditingSymptom(null);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
-    addSymptom({ name: name.trim(), severity, bodyArea: bodyArea || undefined, notes: notes || undefined });
+    if (isEditing && editingSymptom) {
+      updateSymptom(editingSymptom.id, {
+        name: name.trim(),
+        severity,
+        bodyArea: bodyArea || undefined,
+        notes: notes || undefined,
+      });
+    } else {
+      addSymptom({ name: name.trim(), severity, bodyArea: bodyArea || undefined, notes: notes || undefined });
+    }
     setName(''); setSeverity(3); setBodyArea(''); setNotes('');
     setShowForm(false);
+    setEditingSymptom(null);
   };
 
   const repeatLast = () => {
@@ -34,7 +72,6 @@ export default function Symptoms() {
     ? symptoms.filter(s => s.name.toLowerCase().includes(filter.toLowerCase()))
     : symptoms;
 
-  // Trend data: average severity per day over last 14 days
   const severityTrend = useMemo(() => {
     const days: Record<string, { total: number; count: number }> = {};
     const now = Date.now();
@@ -52,7 +89,6 @@ export default function Symptoms() {
     })).reverse();
   }, [symptoms]);
 
-  // Top 5 symptoms by frequency
   const frequencyData = useMemo(() => {
     const counts: Record<string, number> = {};
     symptoms.forEach(s => { counts[s.name] = (counts[s.name] || 0) + 1; });
@@ -64,7 +100,7 @@ export default function Symptoms() {
 
   const hasTrendData = symptoms.length >= 3;
 
-  if (symptoms.length === 0 && !showForm) {
+  if (symptoms.length === 0 && !formOpen) {
     return (
       <div className="p-4 max-w-lg mx-auto pb-[calc(6rem+env(safe-area-inset-bottom))]">
         <EmptyState
@@ -73,7 +109,7 @@ export default function Symptoms() {
           description="Start tracking symptoms to uncover patterns across your care journey."
           action={
             <button
-              onClick={() => setShowForm(true)}
+              onClick={openAdd}
               className="bg-primary text-primary-foreground rounded-xl px-5 py-2.5 text-sm font-medium"
             >
               Log a symptom
@@ -106,21 +142,21 @@ export default function Symptoms() {
             </div>
           )}
           {lastSymptom && (
-            <button onClick={repeatLast} className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-accent text-xs font-medium text-accent-foreground hover:bg-accent/80">
+            <button onClick={repeatLast} aria-label="Repeat last symptom" className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-accent text-xs font-medium text-accent-foreground hover:bg-accent/80">
               <Repeat className="w-3 h-3" /> Repeat last
             </button>
           )}
-          <button onClick={() => setShowForm(true)} className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-primary text-primary-foreground text-xs font-medium">
+          <button onClick={openAdd} className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-primary text-primary-foreground text-xs font-medium">
             <Plus className="w-3 h-3" /> Log
           </button>
         </div>
       </div>
 
       {/* Bottom Sheet Form */}
-      <Drawer open={showForm} onOpenChange={setShowForm}>
+      <Drawer open={formOpen} onOpenChange={closeForm}>
         <DrawerContent>
           <DrawerHeader>
-            <DrawerTitle>Log Symptom</DrawerTitle>
+            <DrawerTitle>{isEditing ? 'Edit Symptom' : 'Log Symptom'}</DrawerTitle>
           </DrawerHeader>
           <div className="overflow-y-auto max-h-[85vh] px-4 pb-6">
             <form onSubmit={handleSubmit} className="space-y-3">
@@ -142,10 +178,11 @@ export default function Symptoms() {
               </div>
               <div>
                 <label className="text-xs text-muted-foreground mb-1 block">Severity</label>
-                <div className="flex gap-2">
+                <div className="flex gap-2" role="group" aria-label="Severity level">
                   {([1,2,3,4,5] as const).map(v => (
                     <button key={v} type="button" onClick={() => setSeverity(v)}
-                      className={`flex-1 py-2 rounded-xl text-sm font-medium transition-colors ${severity === v ? `severity-${v} text-white` : 'bg-muted text-muted-foreground'}`}>
+                      aria-pressed={severity === v}
+                      className={`flex-1 py-2 rounded-xl text-sm font-medium transition-colors ${severity === v ? `${SEVERITY_BG[v]} text-white` : 'bg-muted text-muted-foreground'}`}>
                       {v}
                     </button>
                   ))}
@@ -165,7 +202,7 @@ export default function Symptoms() {
               <textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Notes (optional)"
                 className="w-full bg-muted/50 rounded-xl px-3 py-2 text-sm resize-none h-14 focus:ring-1 focus:ring-primary/30 focus:outline-none" />
               <button type="submit" disabled={!name.trim()} className="w-full bg-primary text-primary-foreground rounded-xl py-2.5 text-sm font-medium disabled:opacity-40">
-                Save symptom
+                {isEditing ? 'Update symptom' : 'Save symptom'}
               </button>
             </form>
           </div>
@@ -175,7 +212,6 @@ export default function Symptoms() {
       {/* Trends View */}
       {view === 'trends' && hasTrendData && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4 mb-4">
-          {/* Severity over time */}
           <div className="bg-card rounded-2xl border border-border p-4">
             <h3 className="text-sm font-semibold text-foreground mb-3">Avg Severity (14 days)</h3>
             <ResponsiveContainer width="100%" height={160}>
@@ -197,8 +233,6 @@ export default function Symptoms() {
               </AreaChart>
             </ResponsiveContainer>
           </div>
-
-          {/* Top symptoms frequency */}
           <div className="bg-card rounded-2xl border border-border p-4">
             <h3 className="text-sm font-semibold text-foreground mb-3">Most Logged Symptoms</h3>
             <ResponsiveContainer width="100%" height={frequencyData.length * 36 + 10}>
@@ -233,7 +267,8 @@ export default function Symptoms() {
               key={s.id}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="bg-card rounded-xl border border-border p-3"
+              className="bg-card rounded-xl border border-border p-3 cursor-pointer hover:border-primary/20 transition-colors"
+              onClick={() => openEdit(s)}
             >
               <div className="flex items-center justify-between">
                 <div className="flex-1 min-w-0">
@@ -241,13 +276,14 @@ export default function Symptoms() {
                   {s.bodyArea && <span className="text-xs text-muted-foreground ml-2">{s.bodyArea}</span>}
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1" role="img" aria-label={`Severity ${s.severity} of 5`}>
                     {Array.from({ length: 5 }).map((_, i) => (
-                      <div key={i} className={`w-1.5 h-1.5 rounded-full ${i < s.severity ? `severity-${s.severity}` : 'bg-muted'}`} />
+                      <div key={i} className={`w-1.5 h-1.5 rounded-full ${i < s.severity ? SEVERITY_BG[s.severity] : 'bg-muted'}`} />
                     ))}
                   </div>
                   <button
-                    onClick={() => deleteSymptom(s.id)}
+                    onClick={(e) => { e.stopPropagation(); deleteSymptom(s.id); }}
+                    aria-label={`Delete symptom ${s.name}`}
                     className="p-1.5 rounded-lg text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10 transition-colors"
                   >
                     <Trash2 className="w-3.5 h-3.5" />

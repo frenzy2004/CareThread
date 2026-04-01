@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, Sparkles, Star } from 'lucide-react';
+import { Heart, Sparkles } from 'lucide-react';
 import { MOOD_EMOJIS, type CheckIn } from '@/types/health';
 
 interface DailyCheckInProps {
@@ -98,7 +98,7 @@ export function DailyCheckIn({ todayCheckIn, streak, onCheckIn, lastCheckIn }: D
       </div>
       <h2 className="text-lg font-semibold text-foreground mb-4">How are you feeling today?</h2>
 
-      <div className="flex justify-between mb-4">
+      <div className="flex justify-between mb-4" role="group" aria-label="Select your mood">
         {MOOD_EMOJIS.map(({ value, emoji, activeEmoji, label }) => {
           const isSelected = selectedMood === value;
           return (
@@ -108,6 +108,8 @@ export function DailyCheckIn({ todayCheckIn, streak, onCheckIn, lastCheckIn }: D
               whileTap={{ scale: 0.85 }}
               animate={{ scale: isSelected ? 1.15 : 1 }}
               transition={{ type: "spring", stiffness: 400, damping: 12 }}
+              aria-label={label}
+              aria-pressed={isSelected}
               className={`flex flex-col items-center gap-1 p-2.5 rounded-xl ${
                 isSelected
                   ? 'bg-primary/10 ring-2 ring-primary/30'
@@ -147,6 +149,7 @@ export function DailyCheckIn({ todayCheckIn, streak, onCheckIn, lastCheckIn }: D
         {lastCheckIn && (
           <button
             onClick={() => handleSubmit(true)}
+            aria-label="Check in with same mood as yesterday"
             className="px-3 bg-accent text-accent-foreground rounded-xl py-2.5 text-xs font-medium hover:bg-accent/80 transition-colors"
           >
             Same as yesterday

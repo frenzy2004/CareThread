@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Plus, Archive } from 'lucide-react';
-import { useHealthData } from '@/hooks/useHealthData';
+import { useHealthDataContext } from '@/contexts/HealthDataContext';
 import { MedicationCard } from '@/components/MedicationCard';
 import { EmptyState } from '@/components/EmptyState';
 import { Badge } from '@/components/ui/badge';
@@ -10,7 +10,7 @@ import type { Medication } from '@/types/health';
 const DISCONTINUE_REASONS = ['Side effects', 'Not helping', 'Doctor changed', 'Completed course', 'Other'];
 
 export default function Medications() {
-  const data = useHealthData();
+  const data = useHealthDataContext();
   const [showForm, setShowForm] = useState(false);
   const [showPast, setShowPast] = useState(false);
   const [editingMed, setEditingMed] = useState<Medication | null>(null);
@@ -22,6 +22,7 @@ export default function Medications() {
   const [dosage, setDosage] = useState('');
   const [frequency, setFrequency] = useState('');
   const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
+  const [providerId, setProviderId] = useState('');
 
   // Discontinue fields
   const [discReason, setDiscReason] = useState('');
@@ -33,7 +34,7 @@ export default function Medications() {
   const openAdd = () => {
     setEditingMed(null);
     setDiscontinuingMed(null);
-    setName(''); setDrugClass(''); setDosage(''); setFrequency('');
+    setName(''); setDrugClass(''); setDosage(''); setFrequency(''); setProviderId('');
     setStartDate(new Date().toISOString().split('T')[0]);
     setShowForm(true);
   };
@@ -45,6 +46,7 @@ export default function Medications() {
     setDosage(med.dosage);
     setFrequency(med.frequency);
     setStartDate(med.startDate);
+    setProviderId(med.providerId || '');
     setEditingMed(med);
     setShowForm(true);
   };
@@ -75,14 +77,15 @@ export default function Medications() {
         dosage,
         frequency,
         startDate,
+        providerId: providerId || undefined,
       });
     } else {
       data.addMedication({
         name: name.trim(), drugClass: drugClass || undefined, dosage, frequency,
-        startDate, providerId: undefined,
+        startDate, providerId: providerId || undefined,
       });
     }
-    setName(''); setDrugClass(''); setDosage(''); setFrequency('');
+    setName(''); setDrugClass(''); setDosage(''); setFrequency(''); setProviderId('');
     setShowForm(false);
     setEditingMed(null);
   };
@@ -95,6 +98,7 @@ export default function Medications() {
   };
 
   const pastMeds = data.medications.filter(m => m.status === 'discontinued');
+  const providerForMed = (med: Medication) => data.providers.find(p => p.id === med.providerId);
 
   if (data.medications.length === 0 && !showForm) {
     return (
@@ -145,6 +149,21 @@ export default function Medications() {
                 <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)}
                   className="w-full bg-muted/50 rounded-xl px-3 py-2.5 text-sm focus:ring-1 focus:ring-primary/30 focus:outline-none" />
               </div>
+              {data.providers.length > 0 && (
+                <div>
+                  <label className="text-xs text-muted-foreground mb-1 block">Prescribing provider</label>
+                  <select
+                    value={providerId}
+                    onChange={e => setProviderId(e.target.value)}
+                    className="w-full bg-muted/50 rounded-xl px-3 py-2.5 text-sm focus:ring-1 focus:ring-primary/30 focus:outline-none"
+                  >
+                    <option value="">None</option>
+                    {data.providers.map(p => (
+                      <option key={p.id} value={p.id}>{p.name} — {p.specialty}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
               <button type="submit" disabled={!name.trim() || !dosage.trim()} className="w-full bg-primary text-primary-foreground rounded-xl py-2.5 text-sm font-medium disabled:opacity-40">
                 {isEditing ? 'Update medication' : 'Save medication'}
               </button>
@@ -201,19 +220,27 @@ export default function Medications() {
         {data.activeMedications.map(med => {
           const tc = data.todayCompliance.find(c => c.medicationId === med.id);
           const daysSince = Math.floor((Date.now() - new Date(med.startDate).getTime()) / (1000*60*60*24));
+          const provider = providerForMed(med);
           return (
-            <MedicationCard
-              key={med.id}
-              medication={med}
-              ratings={data.effectRatings}
-              todayCompliance={tc}
-              onToggleCompliance={(taken) => data.toggleCompliance(med.id, taken)}
-              onRate={(rating) => data.addEffectRating(med.id, rating)}
-              onDelete={() => data.deleteMedication(med.id)}
-              onEdit={() => openEdit(med)}
-              onDiscontinue={() => openDiscontinue(med)}
-              showEffectRating={daysSince >= 7}
-            />
+            <div key={med.id}>
+              <MedicationCard
+                medication={med}
+                ratings={data.effectRatings}
+                todayCompliance={tc}
+                onToggleCompliance={(taken) => data.toggleCompliance(med.id, taken)}
+                onRate={(rating) => data.addEffectRating(med.id, rating)}
+                onDelete={() => data.deleteMedication(med.id)}
+                onEdit={() => openEdit(med)}
+                onDiscontinue={() => openDiscontinue(med)}
+                showEffectRating={daysSince >= 7}
+              />
+              {provider && (
+                <div className="flex items-center gap-1.5 mt-1 ml-4">
+                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: `hsl(${provider.color})` }} />
+                  <span className="text-[10px] text-muted-foreground">{provider.name}</span>
+                </div>
+              )}
+            </div>
           );
         })}
       </div>

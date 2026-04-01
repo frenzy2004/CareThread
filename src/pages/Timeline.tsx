@@ -1,16 +1,16 @@
 import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Eye, EyeOff, Filter } from 'lucide-react';
-import { useHealthData } from '@/hooks/useHealthData';
+import { Eye, EyeOff } from 'lucide-react';
+import { useHealthDataContext } from '@/contexts/HealthDataContext';
 import { useInsights } from '@/hooks/useInsights';
 import { TimelineEvent, type TimelineEventData } from '@/components/TimelineEvent';
 import { InsightCard } from '@/components/InsightCard';
 import { EmptyState } from '@/components/EmptyState';
 
 export default function Timeline() {
-  const data = useHealthData();
+  const data = useHealthDataContext();
   const { insights } = useInsights(data.checkIns, data.symptoms, data.medications, data.compliance, data.effectRatings);
-  const [focusMode, setFocusMode] = useState(false);
+  const [focusMode, setFocusMode] = useState(true);
   const [zoomRange, setZoomRange] = useState<'week' | 'month' | 'all'>('all');
 
   const events = useMemo(() => {
@@ -56,12 +56,10 @@ export default function Timeline() {
 
     items.sort((a, b) => b.timestamp - a.timestamp);
 
-    // Zoom filter
     const now = Date.now();
     const rangeMs = zoomRange === 'week' ? 7*86400000 : zoomRange === 'month' ? 30*86400000 : Infinity;
     const filtered = items.filter(e => now - e.timestamp < rangeMs);
 
-    // Focus mode
     if (focusMode) return filtered.filter(e => e.isMajor);
     return filtered;
   }, [data, insights, focusMode, zoomRange]);
@@ -76,7 +74,6 @@ export default function Timeline() {
           title="Your story starts here"
           description="As you log check-ins, symptoms, and medications, your timeline will reveal your health journey."
         />
-        {/* Sample preview */}
         <div className="mt-4 opacity-50 pointer-events-none">
           <TimelineEvent event={{ id: 'sample', type: 'insight', title: 'Pattern detected', description: 'After 7 days, insights like this will appear here', timestamp: Date.now(), isMajor: true }} />
         </div>
@@ -91,12 +88,13 @@ export default function Timeline() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setFocusMode(!focusMode)}
+            aria-label={focusMode ? 'Show all events' : 'Show key events only'}
             className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-medium transition-colors ${
               focusMode ? 'bg-primary/15 text-primary' : 'bg-muted text-muted-foreground'
             }`}
           >
             {focusMode ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
-            Focus
+            {focusMode ? 'Key events' : 'All events'}
           </button>
         </div>
       </div>
@@ -114,7 +112,9 @@ export default function Timeline() {
       </div>
 
       {events.length === 0 ? (
-        <p className="text-sm text-muted-foreground text-center py-8">No events in this range{focusMode ? ' (try turning off Focus mode)' : ''}</p>
+        <p className="text-sm text-muted-foreground text-center py-8">
+          No events in this range{focusMode ? ' — try switching to "All events"' : ''}
+        </p>
       ) : (
         <div>
           {events.map(event => (

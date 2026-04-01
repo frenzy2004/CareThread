@@ -54,6 +54,10 @@ export function useHealthData() {
     setSymptoms(prev => prev.filter(s => s.id !== id));
   }, [setSymptoms]);
 
+  const updateSymptom = useCallback((id: string, updates: Partial<Omit<Symptom, 'id' | 'timestamp'>>) => {
+    setSymptoms(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
+  }, [setSymptoms]);
+
   const lastSymptom = useMemo(() => symptoms[0] || null, [symptoms]);
 
   // Medications
@@ -115,6 +119,10 @@ export function useHealthData() {
     return entry;
   }, [setProviders, providers.length]);
 
+  const deleteProvider = useCallback((id: string) => {
+    setProviders(prev => prev.filter(p => p.id !== id));
+  }, [setProviders]);
+
   // Backup / Restore
   const exportData = useCallback(() => {
     return JSON.stringify({
@@ -140,11 +148,11 @@ export function useHealthData() {
 
   return {
     checkIns, addCheckIn, todayCheckIn, streak,
-    symptoms, addSymptom, deleteSymptom, lastSymptom,
+    symptoms, addSymptom, updateSymptom, deleteSymptom, lastSymptom,
     medications, activeMedications, addMedication, updateMedication, discontinueMedication, deleteMedication,
     effectRatings, addEffectRating,
     compliance, toggleCompliance, todayCompliance,
-    providers, addProvider,
+    providers, addProvider, deleteProvider,
     exportData, importData,
   };
 }
