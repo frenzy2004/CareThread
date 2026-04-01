@@ -12,6 +12,22 @@ export default function Landing() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [displayedText, setDisplayedText] = useState('');
+
+  const tagline = mode === 'signup'
+    ? 'Your health data stays private on your device. Create an account to access CareThread.'
+    : 'Track symptoms, medications, and patterns across providers.';
+
+  useEffect(() => {
+    setDisplayedText('');
+    let i = 0;
+    const interval = setInterval(() => {
+      i++;
+      setDisplayedText(tagline.slice(0, i));
+      if (i >= tagline.length) clearInterval(interval);
+    }, 30);
+    return () => clearInterval(interval);
+  }, [tagline]);
 
   if (loading) {
     return (
