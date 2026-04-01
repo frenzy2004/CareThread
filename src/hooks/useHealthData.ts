@@ -67,6 +67,14 @@ export function useHealthData() {
     setMedications(prev => prev.map(m => m.id === id ? { ...m, ...updates } : m));
   }, [setMedications]);
 
+  const discontinueMedication = useCallback((id: string, reason?: string) => {
+    setMedications(prev => prev.map(m =>
+      m.id === id
+        ? { ...m, status: 'discontinued' as const, endDate: today(), discontinuationReason: reason }
+        : m
+    ));
+  }, [setMedications]);
+
   const deleteMedication = useCallback((id: string) => {
     setMedications(prev => prev.filter(m => m.id !== id));
   }, [setMedications]);
@@ -133,7 +141,7 @@ export function useHealthData() {
   return {
     checkIns, addCheckIn, todayCheckIn, streak,
     symptoms, addSymptom, deleteSymptom, lastSymptom,
-    medications, activeMedications, addMedication, updateMedication, deleteMedication,
+    medications, activeMedications, addMedication, updateMedication, discontinueMedication, deleteMedication,
     effectRatings, addEffectRating,
     compliance, toggleCompliance, todayCompliance,
     providers, addProvider,
