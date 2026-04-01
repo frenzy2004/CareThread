@@ -140,7 +140,7 @@ export default function Landing() {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full bg-primary text-primary-foreground rounded-xl py-2.5 text-sm font-semibold disabled:opacity-50 transition-opacity"
+              className="w-full bg-primary text-primary-foreground rounded-xl py-2.5 text-sm font-semibold disabled:opacity-50 transition-all duration-200 active:backdrop-blur-sm"
             >
               {submitting ? 'Please wait…' : mode === 'signin' ? 'Sign In' : 'Create Account'}
             </button>
