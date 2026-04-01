@@ -57,6 +57,11 @@ export default function SettingsPage() {
         </div>
       </div>
 
+      {/* PDF Export */}
+      <div className="mb-4">
+        <ExportPDF />
+      </div>
+
       {/* Backup & Restore */}
       <div className="bg-card rounded-2xl border border-border p-4 mb-4">
         <h2 className="font-semibold text-foreground text-sm mb-3">Backup & Restore</h2>
