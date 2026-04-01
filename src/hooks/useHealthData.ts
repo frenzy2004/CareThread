@@ -119,6 +119,10 @@ export function useHealthData() {
     return entry;
   }, [setProviders, providers.length]);
 
+  const deleteProvider = useCallback((id: string) => {
+    setProviders(prev => prev.filter(p => p.id !== id));
+  }, [setProviders]);
+
   // Backup / Restore
   const exportData = useCallback(() => {
     return JSON.stringify({
