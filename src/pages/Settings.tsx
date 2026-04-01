@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Download, Upload, AlertCircle, Check } from 'lucide-react';
 import { useHealthData } from '@/hooks/useHealthData';
+import { ExportPDF } from '@/components/ExportPDF';
 
 export default function SettingsPage() {
   const data = useHealthData();
