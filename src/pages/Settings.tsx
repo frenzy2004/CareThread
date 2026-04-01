@@ -9,6 +9,8 @@ import { useToast } from '@/hooks/use-toast';
 
 export default function SettingsPage() {
   const data = useHealthDataContext();
+  const { signOut } = useAuth();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const fileRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
