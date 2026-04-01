@@ -25,13 +25,14 @@ export function MedicationCard({
   return (
     <div className="bg-card rounded-2xl border border-border p-4">
       <div className="flex items-start justify-between mb-2">
-        <div>
+        <div className="flex-1 min-w-0">
           <h3 className="font-semibold text-foreground text-sm">{medication.name}</h3>
           <p className="text-xs text-muted-foreground">{medication.dosage} · {medication.frequency}</p>
           {medication.drugClass && (
             <p className="text-xs text-muted-foreground/70 mt-0.5">{medication.drugClass}</p>
           )}
         </div>
+        <div className="flex items-center gap-1.5">
         <button
           onClick={() => onToggleCompliance(!(todayCompliance?.taken))}
           className={`w-8 h-8 rounded-xl flex items-center justify-center border transition-colors ${
