@@ -50,6 +50,10 @@ export function useHealthData() {
     return entry;
   }, [setSymptoms]);
 
+  const deleteSymptom = useCallback((id: string) => {
+    setSymptoms(prev => prev.filter(s => s.id !== id));
+  }, [setSymptoms]);
+
   const lastSymptom = useMemo(() => symptoms[0] || null, [symptoms]);
 
   // Medications
