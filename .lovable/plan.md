@@ -1,51 +1,22 @@
 
 
-# Landing + Auth Layer — Final Plan
+# Replace Shader Background with Cosmic Cloud Shader
 
-## Configuration
+Keep the current `AnimatedShaderHero` component structure (accepts `children`, auth form overlays on top) but swap the fragment shader to the dark cosmic cloud shader by Matthias Hurrle that you shared.
 
-- **Supabase URL**: `https://sipldhvknkwpzhcvquhd.supabase.co`
-- **Anon Key**: `sb_publishable_NgnOSdabUdqncZ8OjNXOqQ_tIenPliy` (publishable — safe to store in code)
+## What changes
 
-## Files to Create
+### `src/components/ui/animated-shader-hero.tsx`
+- Replace the `FRAG` shader source with the cosmic cloud shader (the `defaultShaderSource` from your paste — uses `resolution`, `time` uniforms, dark swirling clouds with light points)
+- Update the vertex shader to match (uses `position` instead of `a_position`)
+- Update uniform names from `u_time`/`u_resolution`/`u_pointer` to `time`/`resolution` (matching the new shader)
+- Add `move`, `touch`, `pointerCount`, `pointers` uniforms for pointer interaction support
+- Upgrade the WebGL setup to use the full `WebGLRenderer` + `PointerHandler` classes from your paste for proper multi-touch and pointer tracking
+- Keep the same exported API: `AnimatedShaderHero` with `children` prop — Landing.tsx stays untouched
 
-### 1. `src/integrations/supabase/client.ts`
-Supabase client initialized with the URL and anon key above.
+### No changes to
+- `Landing.tsx` — same auth card overlay, same import
+- Auth flow, routing, or any other files
 
-### 2. `src/components/ui/animated-shader-hero.tsx`
-WebGL2 fractal clouds shader background component. Accepts `children` prop so auth form overlays on top. The pasted code had stripped JSX — I'll reconstruct it with proper markup: full-viewport canvas, pointer interaction, CSS keyframe animations for content fade-in.
-
-### 3. `src/pages/Landing.tsx`
-Single page: shader background + centered auth card.
-- Toggle between Sign In / Sign Up
-- Email + password fields
-- Sign-up copy: *"Your health data stays private on your device. Create an account to access CareThread."*
-- Calls `supabase.auth.signInWithPassword` / `signUp`
-- Error feedback via toast
-- If already authenticated → redirect to `/dashboard`
-
-### 4. `src/contexts/AuthContext.tsx`
-- `onAuthStateChange` listener set up before `getSession()`
-- Exposes `user`, `session`, `loading`, `signOut`
-- `loading` starts `true`, blocks rendering until session resolves
-
-### 5. `src/components/ProtectedRoute.tsx`
-- If `loading` → warm-themed spinner (no flicker)
-- If no session → redirect to `/`
-- If session → render children
-
-## Files to Modify
-
-### 6. `src/App.tsx`
-- Wrap with `AuthProvider` (outside `HealthDataProvider`)
-- `/` → `Landing.tsx` (public)
-- `/dashboard`, `/symptoms`, `/medications`, `/timeline`, `/settings` → wrapped in `ProtectedRoute`
-- SideNav/BottomNav render inside protected area only
-
-### 7. `src/pages/Settings.tsx`
-- Add "Sign Out" button at the bottom
-- Calls `signOut()` from AuthContext, navigates to `/`
-
-## Not Touched
-Dashboard, Symptoms, Medications, Timeline, HealthDataContext, BottomNav, SideNav — zero changes to existing core functionality.
+The result: same auth form, but the background becomes the dark animated cosmic cloud shader with interactive pointer tracking.
 
