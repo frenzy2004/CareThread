@@ -82,9 +82,9 @@ export default function Landing() {
             <button
               type="button"
               onClick={() => setMode('signin')}
-              className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
+              className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
                 mode === 'signin'
-                  ? 'bg-white/20 text-white shadow-sm'
+                  ? 'backdrop-blur-md bg-white/20 text-white shadow-sm'
                   : 'text-white/50'
               }`}
             >
