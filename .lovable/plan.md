@@ -1,85 +1,51 @@
 
 
-# Comprehensive Fix — Implementation Plan
+# Landing + Auth Layer — Final Plan
 
-## Priority 1: Shared State + Tailwind Fix
+## Configuration
 
-### 1a. Create `src/contexts/HealthDataContext.tsx`
-- React context wrapping `useHealthData()` — called once, exposed via `useHealthDataContext()` hook
-- Throws clear error if used outside provider
+- **Supabase URL**: `https://sipldhvknkwpzhcvquhd.supabase.co`
+- **Anon Key**: `sb_publishable_NgnOSdabUdqncZ8OjNXOqQ_tIenPliy` (publishable — safe to store in code)
 
-### 1b. Update `src/App.tsx`
-- Wrap content with `<HealthDataProvider>` inside `<BrowserRouter>`
+## Files to Create
 
-### 1c. Migrate all consumers
-Replace `useHealthData()` → `useHealthDataContext()` in:
-- `Dashboard.tsx`, `Symptoms.tsx`, `Medications.tsx`, `Timeline.tsx`, `Settings.tsx`, `ExportPDF.tsx`
+### 1. `src/integrations/supabase/client.ts`
+Supabase client initialized with the URL and anon key above.
 
-### 1d. Severity class fix
-Create shared map in `src/lib/constants.ts`:
-```ts
-export const SEVERITY_BG: Record<number, string> = {
-  1: 'bg-severity-1', 2: 'bg-severity-2', ...
-};
-```
-Replace all `severity-${n}` dynamic strings in `Dashboard.tsx`, `Symptoms.tsx`, `TimelineEvent.tsx` with map lookups. Add safelist to `tailwind.config.ts`.
+### 2. `src/components/ui/animated-shader-hero.tsx`
+WebGL2 fractal clouds shader background component. Accepts `children` prop so auth form overlays on top. The pasted code had stripped JSX — I'll reconstruct it with proper markup: full-viewport canvas, pointer interaction, CSS keyframe animations for content fade-in.
 
----
+### 3. `src/pages/Landing.tsx`
+Single page: shader background + centered auth card.
+- Toggle between Sign In / Sign Up
+- Email + password fields
+- Sign-up copy: *"Your health data stays private on your device. Create an account to access CareThread."*
+- Calls `supabase.auth.signInWithPassword` / `signUp`
+- Error feedback via toast
+- If already authenticated → redirect to `/dashboard`
 
-## Priority 2: Symptom Editing, Accessibility, Timeline
+### 4. `src/contexts/AuthContext.tsx`
+- `onAuthStateChange` listener set up before `getSession()`
+- Exposes `user`, `session`, `loading`, `signOut`
+- `loading` starts `true`, blocks rendering until session resolves
 
-### 2a. Symptom editing
-- Add `updateSymptom(id, updates)` to `useHealthData.ts`
-- `Symptoms.tsx`: add `editingSymptom` state. Tapping a card opens drawer pre-filled. Title switches to "Edit Symptom". Submit calls update vs add based on state.
+### 5. `src/components/ProtectedRoute.tsx`
+- If `loading` → warm-themed spinner (no flicker)
+- If no session → redirect to `/`
+- If session → render children
 
-### 2b. Accessibility
-- **`DailyCheckIn.tsx`**: `role="group"` + `aria-label="Select your mood"` on mood container. `aria-label={label}` + `aria-pressed={selectedMood === value}` on each mood button.
-- **`MedicationCard.tsx`**: `aria-label` on compliance toggle, discontinue, delete buttons (include medication name).
-- **`Symptoms.tsx`**: `aria-label` on delete buttons. `sr-only` spans on severity dots.
-- **`TimelineEvent.tsx`**: `sr-only` span for severity dots.
-- **`BottomNav.tsx`**: `aria-label` on nav links.
+## Files to Modify
 
-### 2c. Timeline cleanup
-- Default `focusMode` to `true`
-- Rename label: `"Key events"` / `"All events"` toggle text
-- Update empty state message to reference "Key events" instead of "Focus"
+### 6. `src/App.tsx`
+- Wrap with `AuthProvider` (outside `HealthDataProvider`)
+- `/` → `Landing.tsx` (public)
+- `/dashboard`, `/symptoms`, `/medications`, `/timeline`, `/settings` → wrapped in `ProtectedRoute`
+- SideNav/BottomNav render inside protected area only
 
----
+### 7. `src/pages/Settings.tsx`
+- Add "Sign Out" button at the bottom
+- Calls `signOut()` from AuthContext, navigates to `/`
 
-## Priority 3: Provider Management, Dashboard Cleanup
-
-### 3a. Provider management in `Settings.tsx`
-- "Care Team" section: add form (name + specialty), provider list with color dots, delete button
-- Block delete if any medication references the provider (show toast)
-- Add `deleteProvider` to `useHealthData.ts`
-
-### 3b. Provider selector in `Medications.tsx`
-- Add optional provider dropdown in the add/edit medication drawer
-- Show provider name on medication cards if assigned
-
-### 3c. Dashboard med cards
-- Don't pass `onEdit` to `MedicationCard` on Dashboard — removes chevron/tappable hint
-- Keep cards lightweight: compliance toggle + effect rating only
-
----
-
-## Files Summary
-
-| File | Action |
-|------|--------|
-| `src/contexts/HealthDataContext.tsx` | **Create** |
-| `src/lib/constants.ts` | **Create** — severity map |
-| `src/hooks/useHealthData.ts` | Add `updateSymptom`, `deleteProvider` |
-| `src/App.tsx` | Wrap with provider |
-| `src/pages/Dashboard.tsx` | Context hook, severity map, remove med card edit |
-| `src/pages/Symptoms.tsx` | Context hook, edit flow, severity map, a11y |
-| `src/pages/Medications.tsx` | Context hook, provider selector |
-| `src/pages/Timeline.tsx` | Context hook, default key events, rename |
-| `src/pages/Settings.tsx` | Context hook, provider management |
-| `src/components/ExportPDF.tsx` | Context hook |
-| `src/components/MedicationCard.tsx` | Aria-labels |
-| `src/components/DailyCheckIn.tsx` | Aria-labels, aria-pressed |
-| `src/components/TimelineEvent.tsx` | Severity map, sr-only text |
-| `src/components/BottomNav.tsx` | Aria-labels |
-| `tailwind.config.ts` | Safelist severity classes |
+## Not Touched
+Dashboard, Symptoms, Medications, Timeline, HealthDataContext, BottomNav, SideNav — zero changes to existing core functionality.
 
