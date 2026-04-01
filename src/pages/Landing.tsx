@@ -65,10 +65,10 @@ export default function Landing() {
       <div className="w-full max-w-sm">
         {/* Brand */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-foreground drop-shadow-sm">
+          <h1 className="text-3xl font-bold text-white drop-shadow-md">
             CareThread
           </h1>
-          <p className="text-sm text-muted-foreground mt-2 max-w-xs mx-auto">
+          <p className="text-sm text-white/70 mt-2 max-w-xs mx-auto">
             {mode === 'signup'
               ? 'Your health data stays private on your device. Create an account to access CareThread.'
               : 'Track symptoms, medications, and patterns across providers.'}
