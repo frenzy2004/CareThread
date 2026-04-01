@@ -174,12 +174,23 @@ export default function SettingsPage() {
       </div>
 
       {/* About */}
-      <div className="bg-card rounded-2xl border border-border p-4">
+      <div className="bg-card rounded-2xl border border-border p-4 mb-4">
         <h2 className="font-semibold text-foreground text-sm mb-2">About CareThread</h2>
         <p className="text-xs text-muted-foreground">
           A decision-support companion for autoimmune patients. Track symptoms, medications, and find patterns across multiple providers. All data stays on your device.
         </p>
       </div>
+
+      {/* Sign Out */}
+      <button
+        onClick={async () => {
+          await signOut();
+          navigate('/');
+        }}
+        className="w-full flex items-center justify-center gap-2 rounded-2xl border border-destructive/20 bg-destructive/5 text-destructive py-3 text-sm font-medium hover:bg-destructive/10 transition-colors"
+      >
+        <LogOut className="w-4 h-4" /> Sign Out
+      </button>
     </div>
   );
 }
