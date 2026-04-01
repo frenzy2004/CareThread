@@ -105,7 +105,7 @@ export default function Landing() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-xs font-medium text-muted-foreground mb-1.5">
+              <label htmlFor="email" className="block text-xs font-medium text-white/60 mb-1.5">
                 Email
               </label>
               <input
@@ -115,7 +115,7 @@ export default function Landing() {
                 onChange={e => setEmail(e.target.value)}
                 required
                 autoComplete="email"
-                className="w-full bg-muted/50 rounded-xl px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-primary/30 focus:outline-none border border-border/30"
+                className="w-full bg-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder:text-white/30 focus:ring-2 focus:ring-white/20 focus:outline-none border border-white/10"
                 placeholder="you@example.com"
               />
             </div>
