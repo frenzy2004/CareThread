@@ -136,17 +136,16 @@ export default function Dashboard() {
         ) : null}
       </motion.div>
 
-      {/* Floating CTA */}
-      <button
-        onClick={() => {
-          if (!data.todayCheckIn) return; // check-in card handles this
-          navigate('/symptoms');
-        }}
-        className="fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom))] right-4 md:bottom-6 md:right-6 bg-primary text-primary-foreground rounded-2xl px-5 py-3 shadow-lg flex items-center gap-2 text-sm font-medium hover:bg-primary/90 transition-colors z-40"
-      >
-        <Plus className="w-4 h-4" />
-        {data.todayCheckIn ? 'Log symptom' : 'Check in first'}
-      </button>
+      {/* Floating CTA — only show after today's check-in */}
+      {data.todayCheckIn && (
+        <button
+          onClick={() => navigate('/symptoms')}
+          className="fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom))] right-4 md:bottom-6 md:right-6 bg-primary text-primary-foreground rounded-2xl px-5 py-3 shadow-lg flex items-center gap-2 text-sm font-medium hover:bg-primary/90 transition-colors z-40"
+        >
+          <Plus className="w-4 h-4" />
+          Log symptom
+        </button>
+      )}
     </div>
   );
 }
