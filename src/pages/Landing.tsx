@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { AnimatedShaderHero } from '@/components/ui/animated-shader-hero';
 import { supabase } from '@/integrations/supabase/client';
