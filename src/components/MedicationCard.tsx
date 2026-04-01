@@ -31,26 +31,38 @@ export function MedicationCard({
   return (
     <div className="bg-card rounded-2xl border border-border p-4">
       <div className="flex items-start justify-between mb-2">
-        {/* Tappable name/details area */}
-        <button
-          onClick={onEdit}
-          className="flex-1 min-w-0 text-left group"
-          type="button"
-        >
-          <div className="flex items-center gap-1">
+        {/* Tappable name/details area — only interactive if onEdit exists */}
+        {onEdit ? (
+          <button
+            onClick={onEdit}
+            aria-label={`Edit ${medication.name}`}
+            className="flex-1 min-w-0 text-left group"
+            type="button"
+          >
+            <div className="flex items-center gap-1">
+              <h3 className="font-semibold text-foreground text-sm">{medication.name}</h3>
+              <ChevronRight className="w-3 h-3 text-muted-foreground/50 group-hover:text-muted-foreground transition-colors shrink-0" />
+            </div>
+            <p className="text-xs text-muted-foreground">{medication.dosage} · {medication.frequency}</p>
+            {medication.drugClass && (
+              <p className="text-xs text-muted-foreground/70 mt-0.5">{medication.drugClass}</p>
+            )}
+          </button>
+        ) : (
+          <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-foreground text-sm">{medication.name}</h3>
-            {onEdit && <ChevronRight className="w-3 h-3 text-muted-foreground/50 group-hover:text-muted-foreground transition-colors shrink-0" />}
+            <p className="text-xs text-muted-foreground">{medication.dosage} · {medication.frequency}</p>
+            {medication.drugClass && (
+              <p className="text-xs text-muted-foreground/70 mt-0.5">{medication.drugClass}</p>
+            )}
           </div>
-          <p className="text-xs text-muted-foreground">{medication.dosage} · {medication.frequency}</p>
-          {medication.drugClass && (
-            <p className="text-xs text-muted-foreground/70 mt-0.5">{medication.drugClass}</p>
-          )}
-        </button>
+        )}
 
         <div className="flex items-center gap-1.5">
           {/* Compliance toggle */}
           <button
             onClick={() => onToggleCompliance(!(todayCompliance?.taken))}
+            aria-label={todayCompliance?.taken ? `Mark ${medication.name} as not taken` : `Mark ${medication.name} as taken`}
             className={`w-8 h-8 rounded-xl flex items-center justify-center border transition-colors ${
               todayCompliance?.taken
                 ? 'bg-secondary/15 border-secondary/30 text-secondary'
@@ -64,8 +76,8 @@ export function MedicationCard({
           {onDiscontinue && (
             <button
               onClick={onDiscontinue}
+              aria-label={`Discontinue ${medication.name}`}
               className="p-1.5 rounded-lg text-muted-foreground/50 hover:text-amber-600 hover:bg-amber-500/10 transition-colors"
-              title="Discontinue"
             >
               <Pause className="w-3.5 h-3.5" />
             </button>
@@ -76,6 +88,7 @@ export function MedicationCard({
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <button
+                  aria-label={`Delete ${medication.name}`}
                   className="p-1.5 rounded-lg text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10 transition-colors"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -111,6 +124,8 @@ export function MedicationCard({
                 <button
                   key={r}
                   onClick={() => onRate(r)}
+                  aria-label={`Rate ${medication.name} as ${label}`}
+                  aria-pressed={active}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                     active ? `${cls} bg-accent` : 'text-muted-foreground hover:bg-muted'
                   }`}

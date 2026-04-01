@@ -1,19 +1,20 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Activity, Sparkles } from 'lucide-react';
-import { useHealthData } from '@/hooks/useHealthData';
+import { useHealthDataContext } from '@/contexts/HealthDataContext';
 import { useInsights } from '@/hooks/useInsights';
 import { DailyCheckIn } from '@/components/DailyCheckIn';
 import { MedicationCard } from '@/components/MedicationCard';
 import { InsightCard, InsightPreview } from '@/components/InsightCard';
 import { EmptyState } from '@/components/EmptyState';
 import { WeeklySummary } from '@/components/WeeklySummary';
+import { SEVERITY_BG } from '@/lib/constants';
 import { MOOD_EMOJIS } from '@/types/health';
 import { useNavigate } from 'react-router-dom';
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const data = useHealthData();
+  const data = useHealthDataContext();
   const { insights, daysUntilInsights, topInsight } = useInsights(
     data.checkIns, data.symptoms, data.medications, data.compliance, data.effectRatings
   );
@@ -110,11 +111,11 @@ export default function Dashboard() {
                   <span className="text-sm font-medium text-foreground">{s.name}</span>
                   {s.bodyArea && <span className="text-xs text-muted-foreground ml-2">{s.bodyArea}</span>}
                 </div>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1" role="img" aria-label={`Severity ${s.severity} of 5`}>
                   {Array.from({ length: 5 }).map((_, i) => (
                     <div
                       key={i}
-                      className={`w-1.5 h-1.5 rounded-full ${i < s.severity ? `severity-${s.severity}` : 'bg-muted'}`}
+                      className={`w-1.5 h-1.5 rounded-full ${i < s.severity ? SEVERITY_BG[s.severity] : 'bg-muted'}`}
                     />
                   ))}
                 </div>
@@ -140,6 +141,7 @@ export default function Dashboard() {
       {data.todayCheckIn && (
         <button
           onClick={() => navigate('/symptoms')}
+          aria-label="Log a new symptom"
           className="fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom))] right-4 md:bottom-6 md:right-6 bg-primary text-primary-foreground rounded-2xl px-5 py-3 shadow-lg flex items-center gap-2 text-sm font-medium hover:bg-primary/90 transition-colors z-40"
         >
           <Plus className="w-4 h-4" />

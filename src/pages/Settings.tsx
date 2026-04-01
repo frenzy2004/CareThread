@@ -1,13 +1,19 @@
 import React, { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Download, Upload, AlertCircle, Check } from 'lucide-react';
-import { useHealthData } from '@/hooks/useHealthData';
+import { Download, Upload, AlertCircle, Check, Plus, Trash2 } from 'lucide-react';
+import { useHealthDataContext } from '@/contexts/HealthDataContext';
 import { ExportPDF } from '@/components/ExportPDF';
+import { useToast } from '@/hooks/use-toast';
 
 export default function SettingsPage() {
-  const data = useHealthData();
+  const data = useHealthDataContext();
+  const { toast } = useToast();
   const fileRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
+
+  // Provider form
+  const [providerName, setProviderName] = useState('');
+  const [providerSpecialty, setProviderSpecialty] = useState('');
 
   const handleExport = () => {
     const json = data.exportData();
@@ -30,6 +36,27 @@ export default function SettingsPage() {
       setTimeout(() => setStatus('idle'), 3000);
     };
     reader.readAsText(file);
+  };
+
+  const handleAddProvider = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!providerName.trim() || !providerSpecialty.trim()) return;
+    data.addProvider({ name: providerName.trim(), specialty: providerSpecialty.trim() });
+    setProviderName('');
+    setProviderSpecialty('');
+  };
+
+  const handleDeleteProvider = (id: string) => {
+    const isReferenced = data.medications.some(m => m.providerId === id);
+    if (isReferenced) {
+      toast({
+        title: "Can't delete provider",
+        description: "This provider is still linked to a medication. Remove the link first.",
+        variant: "destructive",
+      });
+      return;
+    }
+    data.deleteProvider(id);
   };
 
   const totalEntries = data.checkIns.length + data.symptoms.length + data.medications.length;
@@ -55,6 +82,60 @@ export default function SettingsPage() {
             <p className="text-xs text-muted-foreground">Medications</p>
           </div>
         </div>
+      </div>
+
+      {/* Care Team */}
+      <div className="bg-card rounded-2xl border border-border p-4 mb-4">
+        <h2 className="font-semibold text-foreground text-sm mb-3">Care Team</h2>
+        
+        {data.providers.length > 0 && (
+          <div className="space-y-2 mb-3">
+            {data.providers.map(p => (
+              <div key={p.id} className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: `hsl(${p.color})` }} />
+                  <div>
+                    <span className="text-sm font-medium text-foreground">{p.name}</span>
+                    <span className="text-xs text-muted-foreground ml-1.5">{p.specialty}</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => handleDeleteProvider(p.id)}
+                  aria-label={`Delete provider ${p.name}`}
+                  className="p-1.5 rounded-lg text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10 transition-colors"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <form onSubmit={handleAddProvider} className="flex gap-2">
+          <input
+            value={providerName}
+            onChange={e => setProviderName(e.target.value)}
+            placeholder="Name"
+            className="flex-1 bg-muted/50 rounded-xl px-3 py-2 text-sm focus:ring-1 focus:ring-primary/30 focus:outline-none"
+          />
+          <input
+            value={providerSpecialty}
+            onChange={e => setProviderSpecialty(e.target.value)}
+            placeholder="Specialty"
+            className="flex-1 bg-muted/50 rounded-xl px-3 py-2 text-sm focus:ring-1 focus:ring-primary/30 focus:outline-none"
+          />
+          <button
+            type="submit"
+            disabled={!providerName.trim() || !providerSpecialty.trim()}
+            className="p-2 rounded-xl bg-primary text-primary-foreground disabled:opacity-40"
+            aria-label="Add provider"
+          >
+            <Plus className="w-4 h-4" />
+          </button>
+        </form>
+        {data.providers.length === 0 && (
+          <p className="text-xs text-muted-foreground mt-2">Add your doctors and specialists to link them to medications.</p>
+        )}
       </div>
 
       {/* PDF Export */}
