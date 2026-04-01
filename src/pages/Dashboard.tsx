@@ -7,6 +7,7 @@ import { DailyCheckIn } from '@/components/DailyCheckIn';
 import { MedicationCard } from '@/components/MedicationCard';
 import { InsightCard, InsightPreview } from '@/components/InsightCard';
 import { EmptyState } from '@/components/EmptyState';
+import { WeeklySummary } from '@/components/WeeklySummary';
 import { MOOD_EMOJIS } from '@/types/health';
 import { useNavigate } from 'react-router-dom';
 
