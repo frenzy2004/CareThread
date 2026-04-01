@@ -111,26 +111,28 @@ export default function SettingsPage() {
           </div>
         )}
 
-        <form onSubmit={handleAddProvider} className="flex gap-2">
-          <input
-            value={providerName}
-            onChange={e => setProviderName(e.target.value)}
-            placeholder="Name"
-            className="flex-1 bg-muted/50 rounded-xl px-3 py-2 text-sm focus:ring-1 focus:ring-primary/30 focus:outline-none"
-          />
-          <input
-            value={providerSpecialty}
-            onChange={e => setProviderSpecialty(e.target.value)}
-            placeholder="Specialty"
-            className="flex-1 bg-muted/50 rounded-xl px-3 py-2 text-sm focus:ring-1 focus:ring-primary/30 focus:outline-none"
-          />
+        <form onSubmit={handleAddProvider} className="space-y-2">
+          <div className="flex gap-2">
+            <input
+              value={providerName}
+              onChange={e => setProviderName(e.target.value)}
+              placeholder="Name"
+              className="flex-1 min-w-0 bg-muted/50 rounded-xl px-3 py-2 text-sm focus:ring-1 focus:ring-primary/30 focus:outline-none"
+            />
+            <input
+              value={providerSpecialty}
+              onChange={e => setProviderSpecialty(e.target.value)}
+              placeholder="Specialty"
+              className="flex-1 min-w-0 bg-muted/50 rounded-xl px-3 py-2 text-sm focus:ring-1 focus:ring-primary/30 focus:outline-none"
+            />
+          </div>
           <button
             type="submit"
             disabled={!providerName.trim() || !providerSpecialty.trim()}
-            className="p-2 rounded-xl bg-primary text-primary-foreground disabled:opacity-40"
+            className="w-full flex items-center justify-center gap-1.5 rounded-xl bg-primary text-primary-foreground py-2 text-sm font-medium disabled:opacity-40"
             aria-label="Add provider"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-4 h-4" /> Add provider
           </button>
         </form>
         {data.providers.length === 0 && (
