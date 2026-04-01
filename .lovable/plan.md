@@ -1,26 +1,39 @@
 
 
-# Make Mood Emojis Reactive
+# Medication Section Polish — Final
 
-**`src/components/DailyCheckIn.tsx`** — One file change:
+No changes from the revised plan. User feedback confirms the approach and adds three refinements to incorporate:
 
-1. Convert each emoji `<button>` to `<motion.button>` with:
-   - `whileTap={{ scale: 0.85 }}`
-   - `animate={{ scale: selectedMood === value ? 1.15 : 1 }}`
-   - `transition={{ type: "spring", stiffness: 400, damping: 12 }}`
-   - Remove static `scale-110` from the className
+1. **Lightweight discontinue Drawer** — medication name, chips, text field only for "Other", single confirm button. No extra chrome.
+2. **Mutual exclusion** — `editingMed` and `discontinuingMed` clear each other when set.
+3. **Immediate visual result** — on discontinue confirm, close Drawer, med moves from active to past section instantly.
 
-2. Wrap emoji text in `<motion.span>` with:
-   - `key={selectedMood === value ? 'selected' : 'idle'}` — this ensures the wiggle plays only on selection change, not every re-render
-   - `initial={{ rotate: 0 }}`
-   - `animate={{ rotate: selectedMood === value ? [0, -8, 8, -4, 0] : 0 }}`
-   - `transition={{ duration: 0.4 }}`
+All three are implementation details within the existing plan structure.
 
-The `key` prop is the critical detail — it forces React to remount the span only when selection state changes, so the wiggle animation fires once on select, not continuously.
+---
 
-No other animations added. Button handles scale, span handles wiggle. Clean separation.
+## Changes by file
 
-| File | Change |
-|------|--------|
-| `src/components/DailyCheckIn.tsx` | motion.button + motion.span with spring scale and rotate wiggle |
+### `src/hooks/useHealthData.ts`
+- Add `discontinueMedication(id, reason?)` — sets `status: 'discontinued'`, `endDate: today()`, `discontinuationReason`
+- Export it in the return object
+
+### `src/components/MedicationCard.tsx`
+- Add `onEdit`, `onDiscontinue` props
+- Replace `X` icon with `Circle` for untaken compliance
+- Make name/details area a tappable button calling `onEdit`, add `ChevronRight` affordance
+- Wrap trash icon in `AlertDialog` — "Delete medication? This can't be undone. To preserve history, discontinue instead." Cancel / Delete
+- Add `Pause` icon button for discontinue (more prominent than trash)
+
+### `src/pages/Medications.tsx`
+- Add `editingMed` and `discontinuingMed` state, mutually exclusive (setting one clears the other)
+- **Edit mode**: open existing drawer pre-filled, submit calls `updateMedication`
+- **Discontinue Drawer**: med name header, reason chips (Side effects · Not helping · Doctor changed · Completed course · Other), text field appears only when "Other" selected, Confirm button → calls `discontinueMedication`, closes drawer
+- **Past meds section**: show Badge ("Discontinued"), end date, reason if provided
+
+| File | Summary |
+|------|---------|
+| `useHealthData.ts` | `discontinueMedication` function |
+| `MedicationCard.tsx` | `onEdit` + `onDiscontinue` props, AlertDialog, Circle icon, ChevronRight |
+| `Medications.tsx` | Edit + discontinue flows, mutual exclusion, enhanced past-med cards |
 
