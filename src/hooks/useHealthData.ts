@@ -67,6 +67,10 @@ export function useHealthData() {
     setMedications(prev => prev.map(m => m.id === id ? { ...m, ...updates } : m));
   }, [setMedications]);
 
+  const deleteMedication = useCallback((id: string) => {
+    setMedications(prev => prev.filter(m => m.id !== id));
+  }, [setMedications]);
+
   const activeMedications = useMemo(() => medications.filter(m => m.status === 'active'), [medications]);
 
   // Effect ratings
