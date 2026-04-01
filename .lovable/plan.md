@@ -1,63 +1,43 @@
 
 
-# Plan: PDF Export + Symptom Trend Charts
+# Weekly Summary Card — Final Refined Plan
 
-Two features in one update: (1) Doctor Summary PDF export with Patient/Doctor view toggle, (2) Recharts-based severity trend charts on the Symptoms page.
+## Component: `src/components/WeeklySummary.tsx`
 
----
+Warm "This week at a glance" card between Daily Check-in and Today's Medications. Shown when 2+ check-in days exist in the last 7.
 
-## 1. Symptom Trend Charts (Symptoms Page)
+### 2x2 grid + footer
 
-Add a "Trends" section above the symptom list in `src/pages/Symptoms.tsx`:
+| Check-ins | Avg Mood |
+|-----------|----------|
+| 5 of 7 days | 🙂 3.8 |
+| **Symptoms** | **Compliance** |
+| 12 symptoms logged | Took most doses |
+| ↗ Mood trending upward |
 
-- **Weekly severity chart**: Area/line chart using `recharts` showing average daily severity over the last 14 days
-- **Symptom frequency bar chart**: Horizontal bars showing top 5 most-logged symptoms with count
-- **Toggle**: "List" vs "Trends" view tabs at the top so charts don't clutter the log view
-- Uses the warm severity color palette (gold → terracotta gradient)
-- Only shows when there are 3+ symptom entries (otherwise too little data)
+### Key refinements
 
-**Files modified**: `src/pages/Symptoms.tsx`
+**Symptom wording**: Use `"{n} symptoms logged"` or `"{n} entries this week"` if zero symptoms — never just a bare number.
 
----
+**Compliance tiers** (fixed in code):
+- 100% → "Took all doses"
+- 80–99% → "Took most doses"
+- 40–79% → "Some doses missed"
+- <40% → "Several doses missed"
 
-## 2. PDF Export with Patient/Doctor Mode
+Denominator: only count days where `today >= med.startDate` within the 7-day window per active med.
 
-Create a new export component and utility:
+**Mood trend deadband** (±0.3):
+- diff > 0.3 → "Mood trending upward" ↗
+- diff < -0.3 → "Mood trending downward" ↘
+- otherwise → "Mood holding steady" →
 
-### `src/lib/pdf-export.ts`
-- Uses `jspdf` + `jspdf-autotable` for client-side PDF generation
-- Two modes controlled by a `mode: 'patient' | 'doctor'` parameter:
+Comparison: average mood of days 1–3 vs days 4–7 of the week.
 
-| Aspect | Patient View | Doctor View |
-|--------|-------------|-------------|
-| Language | Warm, friendly | Clinical, concise |
-| Emojis | Mood emojis shown | No emojis, numeric scale |
-| Layout | Narrative with insights | Summary tables only |
-| Sections | Trends, insights, notes | Meds table, severity stats, timeline |
+### Visibility
+Hidden when <2 check-in days in the last 7.
 
-- Sections: header with date range, current medications table, symptom summary (top symptoms + avg severity), check-in mood trend, compliance stats
-- Branded with CareThread warm colors (terracotta accents in headers)
-
-### `src/components/ExportPDF.tsx`
-- Modal/card UI triggered from Settings page
-- Date range picker (last 7/14/30 days or custom)
-- Patient View / Doctor View toggle (styled warm switch)
-- "Generate PDF" button → downloads file
-
-### `src/pages/Settings.tsx`
-- Add "Share with Doctor" section with the ExportPDF component between the data overview and backup sections
-
-**New files**: `src/lib/pdf-export.ts`, `src/components/ExportPDF.tsx`
-**Modified files**: `src/pages/Settings.tsx`
-**New dependency**: `jspdf`, `jspdf-autotable`
-
----
-
-## Implementation Order
-
-1. Add `jspdf` + `jspdf-autotable` dependencies
-2. Build symptom trend charts in Symptoms page
-3. Build PDF generation utility (`pdf-export.ts`)
-4. Build ExportPDF component with mode toggle
-5. Wire into Settings page
+## Files
+- **New**: `src/components/WeeklySummary.tsx`
+- **Modified**: `src/pages/Dashboard.tsx` — render after DailyCheckIn, pass health data props
 
