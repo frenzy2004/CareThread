@@ -48,7 +48,7 @@ export function ExportPDF() {
     <motion.div
       initial={{ opacity: 0, y: 4 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-card rounded-2xl border border-border p-4"
+      className="bg-card rounded-2xl border border-border p-4 overflow-hidden w-full box-border"
     >
       <div className="flex items-center gap-2 mb-3">
         <FileText className="w-4 h-4 text-primary" />
