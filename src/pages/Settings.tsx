@@ -1,12 +1,16 @@
 import React, { useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Download, Upload, AlertCircle, Check, Plus, Trash2 } from 'lucide-react';
+import { Download, Upload, AlertCircle, Check, Plus, Trash2, LogOut } from 'lucide-react';
 import { useHealthDataContext } from '@/contexts/HealthDataContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { ExportPDF } from '@/components/ExportPDF';
 import { useToast } from '@/hooks/use-toast';
 
 export default function SettingsPage() {
   const data = useHealthDataContext();
+  const { signOut } = useAuth();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const fileRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
@@ -170,12 +174,23 @@ export default function SettingsPage() {
       </div>
 
       {/* About */}
-      <div className="bg-card rounded-2xl border border-border p-4">
+      <div className="bg-card rounded-2xl border border-border p-4 mb-4">
         <h2 className="font-semibold text-foreground text-sm mb-2">About CareThread</h2>
         <p className="text-xs text-muted-foreground">
           A decision-support companion for autoimmune patients. Track symptoms, medications, and find patterns across multiple providers. All data stays on your device.
         </p>
       </div>
+
+      {/* Sign Out */}
+      <button
+        onClick={async () => {
+          await signOut();
+          navigate('/');
+        }}
+        className="w-full flex items-center justify-center gap-2 rounded-2xl border border-destructive/20 bg-destructive/5 text-destructive py-3 text-sm font-medium hover:bg-destructive/10 transition-colors"
+      >
+        <LogOut className="w-4 h-4" /> Sign Out
+      </button>
     </div>
   );
 }
