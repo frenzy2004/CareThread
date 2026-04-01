@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, X, Archive } from 'lucide-react';
+import { Plus, Archive } from 'lucide-react';
 import { useHealthData } from '@/hooks/useHealthData';
 import { MedicationCard } from '@/components/MedicationCard';
 import { EmptyState } from '@/components/EmptyState';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 
 export default function Medications() {
   const data = useHealthData();
