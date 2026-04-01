@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Download, Upload, AlertCircle, Check } from 'lucide-react';
 import { useHealthData } from '@/hooks/useHealthData';
+import { ExportPDF } from '@/components/ExportPDF';
 
 export default function SettingsPage() {
   const data = useHealthData();
@@ -54,6 +55,11 @@ export default function SettingsPage() {
             <p className="text-xs text-muted-foreground">Medications</p>
           </div>
         </div>
+      </div>
+
+      {/* PDF Export */}
+      <div className="mb-4">
+        <ExportPDF />
       </div>
 
       {/* Backup & Restore */}
