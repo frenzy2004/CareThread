@@ -147,7 +147,7 @@ export default function Landing() {
           </form>
         </div>
 
-        <p className="text-center text-xs text-muted-foreground/70 mt-4">
+        <p className="text-center text-xs text-white/40 mt-4">
           All health data is stored locally on your device.
         </p>
       </div>
