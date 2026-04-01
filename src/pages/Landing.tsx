@@ -84,10 +84,9 @@ export default function Landing() {
           <h1 className="text-3xl font-bold text-white drop-shadow-md">
             CareThread
           </h1>
-          <p className="text-sm text-white/70 mt-2 max-w-xs mx-auto">
-            {mode === 'signup'
-              ? 'Your health data stays private on your device. Create an account to access CareThread.'
-              : 'Track symptoms, medications, and patterns across providers.'}
+          <p className="text-sm text-white/70 mt-2 max-w-xs mx-auto min-h-[2.5rem]">
+            {displayedText}
+            <span className="inline-block w-[2px] h-[1em] bg-white/60 ml-0.5 align-middle animate-pulse" />
           </p>
         </div>
 
