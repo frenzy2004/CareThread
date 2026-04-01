@@ -1,10 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, X, Repeat, BarChart3, List } from 'lucide-react';
+import { Plus, Repeat, BarChart3, List } from 'lucide-react';
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { useHealthData } from '@/hooks/useHealthData';
 import { EmptyState } from '@/components/EmptyState';
 import { COMMON_SYMPTOMS, BODY_AREAS } from '@/types/health';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 
 export default function Symptoms() {
   const { symptoms, addSymptom, lastSymptom } = useHealthData();
@@ -65,7 +66,7 @@ export default function Symptoms() {
 
   if (symptoms.length === 0 && !showForm) {
     return (
-      <div className="p-4 max-w-lg mx-auto pb-24">
+      <div className="p-4 max-w-lg mx-auto pb-[calc(6rem+env(safe-area-inset-bottom))]">
         <EmptyState
           icon="🌡️"
           title="Log your first symptom"
@@ -84,7 +85,7 @@ export default function Symptoms() {
   }
 
   return (
-    <div className="p-4 max-w-lg mx-auto pb-24">
+    <div className="p-4 max-w-lg mx-auto pb-[calc(6rem+env(safe-area-inset-bottom))]">
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-xl font-bold text-foreground">Symptoms</h1>
         <div className="flex gap-2">
@@ -115,60 +116,61 @@ export default function Symptoms() {
         </div>
       </div>
 
-      {/* Form Modal */}
-      {showForm && (
-        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="bg-card rounded-2xl border border-border p-4 mb-4">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="font-semibold text-foreground text-sm">Log Symptom</h2>
-            <button onClick={() => setShowForm(false)} className="text-muted-foreground"><X className="w-4 h-4" /></button>
+      {/* Bottom Sheet Form */}
+      <Drawer open={showForm} onOpenChange={setShowForm}>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>Log Symptom</DrawerTitle>
+          </DrawerHeader>
+          <div className="overflow-y-auto max-h-[85vh] px-4 pb-6">
+            <form onSubmit={handleSubmit} className="space-y-3">
+              <div>
+                <input
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  placeholder="Symptom name"
+                  className="w-full bg-muted/50 rounded-xl px-3 py-2.5 text-sm focus:ring-1 focus:ring-primary/30 focus:outline-none"
+                />
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {COMMON_SYMPTOMS.slice(0, 8).map(s => (
+                    <button key={s} type="button" onClick={() => setName(s)}
+                      className={`px-2.5 py-1 rounded-lg text-xs transition-colors ${name === s ? 'bg-primary/15 text-primary font-medium' : 'bg-muted text-muted-foreground hover:bg-accent'}`}>
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Severity</label>
+                <div className="flex gap-2">
+                  {([1,2,3,4,5] as const).map(v => (
+                    <button key={v} type="button" onClick={() => setSeverity(v)}
+                      className={`flex-1 py-2 rounded-xl text-sm font-medium transition-colors ${severity === v ? `severity-${v} text-white` : 'bg-muted text-muted-foreground'}`}>
+                      {v}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Body area</label>
+                <div className="flex flex-wrap gap-1.5">
+                  {BODY_AREAS.map(a => (
+                    <button key={a} type="button" onClick={() => setBodyArea(bodyArea === a ? '' : a)}
+                      className={`px-2.5 py-1 rounded-lg text-xs transition-colors ${bodyArea === a ? 'bg-primary/15 text-primary font-medium' : 'bg-muted text-muted-foreground hover:bg-accent'}`}>
+                      {a}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Notes (optional)"
+                className="w-full bg-muted/50 rounded-xl px-3 py-2 text-sm resize-none h-14 focus:ring-1 focus:ring-primary/30 focus:outline-none" />
+              <button type="submit" disabled={!name.trim()} className="w-full bg-primary text-primary-foreground rounded-xl py-2.5 text-sm font-medium disabled:opacity-40">
+                Save symptom
+              </button>
+            </form>
           </div>
-          <form onSubmit={handleSubmit} className="space-y-3">
-            <div>
-              <input
-                value={name}
-                onChange={e => setName(e.target.value)}
-                placeholder="Symptom name"
-                className="w-full bg-muted/50 rounded-xl px-3 py-2.5 text-sm focus:ring-1 focus:ring-primary/30 focus:outline-none"
-              />
-              <div className="flex flex-wrap gap-1.5 mt-2">
-                {COMMON_SYMPTOMS.slice(0, 8).map(s => (
-                  <button key={s} type="button" onClick={() => setName(s)}
-                    className={`px-2.5 py-1 rounded-lg text-xs transition-colors ${name === s ? 'bg-primary/15 text-primary font-medium' : 'bg-muted text-muted-foreground hover:bg-accent'}`}>
-                    {s}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div>
-              <label className="text-xs text-muted-foreground mb-1 block">Severity</label>
-              <div className="flex gap-2">
-                {([1,2,3,4,5] as const).map(v => (
-                  <button key={v} type="button" onClick={() => setSeverity(v)}
-                    className={`flex-1 py-2 rounded-xl text-sm font-medium transition-colors ${severity === v ? `severity-${v} text-white` : 'bg-muted text-muted-foreground'}`}>
-                    {v}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div>
-              <label className="text-xs text-muted-foreground mb-1 block">Body area</label>
-              <div className="flex flex-wrap gap-1.5">
-                {BODY_AREAS.map(a => (
-                  <button key={a} type="button" onClick={() => setBodyArea(bodyArea === a ? '' : a)}
-                    className={`px-2.5 py-1 rounded-lg text-xs transition-colors ${bodyArea === a ? 'bg-primary/15 text-primary font-medium' : 'bg-muted text-muted-foreground hover:bg-accent'}`}>
-                    {a}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Notes (optional)"
-              className="w-full bg-muted/50 rounded-xl px-3 py-2 text-sm resize-none h-14 focus:ring-1 focus:ring-primary/30 focus:outline-none" />
-            <button type="submit" disabled={!name.trim()} className="w-full bg-primary text-primary-foreground rounded-xl py-2.5 text-sm font-medium disabled:opacity-40">
-              Save symptom
-            </button>
-          </form>
-        </motion.div>
-      )}
+        </DrawerContent>
+      </Drawer>
 
       {/* Trends View */}
       {view === 'trends' && hasTrendData && (

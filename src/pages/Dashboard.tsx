@@ -48,7 +48,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="p-4 max-w-lg mx-auto pb-24 space-y-4">
+    <div className="p-4 max-w-lg mx-auto pb-[calc(6rem+env(safe-area-inset-bottom))] space-y-4">
       {/* Daily Check-in */}
       <DailyCheckIn
         todayCheckIn={data.todayCheckIn}
@@ -142,7 +142,7 @@ export default function Dashboard() {
           if (!data.todayCheckIn) return; // check-in card handles this
           navigate('/symptoms');
         }}
-        className="fixed bottom-20 right-4 md:bottom-6 md:right-6 bg-primary text-primary-foreground rounded-2xl px-5 py-3 shadow-lg flex items-center gap-2 text-sm font-medium hover:bg-primary/90 transition-colors z-40"
+        className="fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom))] right-4 md:bottom-6 md:right-6 bg-primary text-primary-foreground rounded-2xl px-5 py-3 shadow-lg flex items-center gap-2 text-sm font-medium hover:bg-primary/90 transition-colors z-40"
       >
         <Plus className="w-4 h-4" />
         {data.todayCheckIn ? 'Log symptom' : 'Check in first'}

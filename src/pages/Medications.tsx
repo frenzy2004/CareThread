@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, X, Archive } from 'lucide-react';
+import { Plus, Archive } from 'lucide-react';
 import { useHealthData } from '@/hooks/useHealthData';
 import { MedicationCard } from '@/components/MedicationCard';
 import { EmptyState } from '@/components/EmptyState';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 
 export default function Medications() {
   const data = useHealthData();
@@ -29,7 +30,7 @@ export default function Medications() {
 
   if (data.medications.length === 0 && !showForm) {
     return (
-      <div className="p-4 max-w-lg mx-auto pb-24">
+      <div className="p-4 max-w-lg mx-auto pb-[calc(6rem+env(safe-area-inset-bottom))]">
         <EmptyState
           icon="💊"
           title="Add your first medication"
@@ -45,7 +46,7 @@ export default function Medications() {
   }
 
   return (
-    <div className="p-4 max-w-lg mx-auto pb-24">
+    <div className="p-4 max-w-lg mx-auto pb-[calc(6rem+env(safe-area-inset-bottom))]">
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-xl font-bold text-foreground">Medications</h1>
         <button onClick={() => setShowForm(true)} className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-primary text-primary-foreground text-xs font-medium">
@@ -53,34 +54,36 @@ export default function Medications() {
         </button>
       </div>
 
-      {showForm && (
-        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="bg-card rounded-2xl border border-border p-4 mb-4">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="font-semibold text-foreground text-sm">Add Medication</h2>
-            <button onClick={() => setShowForm(false)} className="text-muted-foreground"><X className="w-4 h-4" /></button>
-          </div>
-          <form onSubmit={handleSubmit} className="space-y-3">
-            <input value={name} onChange={e => setName(e.target.value)} placeholder="Medication name"
-              className="w-full bg-muted/50 rounded-xl px-3 py-2.5 text-sm focus:ring-1 focus:ring-primary/30 focus:outline-none" />
-            <input value={drugClass} onChange={e => setDrugClass(e.target.value)} placeholder="Drug class (optional)"
-              className="w-full bg-muted/50 rounded-xl px-3 py-2.5 text-sm focus:ring-1 focus:ring-primary/30 focus:outline-none" />
-            <div className="grid grid-cols-2 gap-2">
-              <input value={dosage} onChange={e => setDosage(e.target.value)} placeholder="Dosage (e.g. 50mg)"
-                className="bg-muted/50 rounded-xl px-3 py-2.5 text-sm focus:ring-1 focus:ring-primary/30 focus:outline-none" />
-              <input value={frequency} onChange={e => setFrequency(e.target.value)} placeholder="Frequency (e.g. daily)"
-                className="bg-muted/50 rounded-xl px-3 py-2.5 text-sm focus:ring-1 focus:ring-primary/30 focus:outline-none" />
-            </div>
-            <div>
-              <label className="text-xs text-muted-foreground mb-1 block">Start date</label>
-              <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)}
+      {/* Bottom Sheet Form */}
+      <Drawer open={showForm} onOpenChange={setShowForm}>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>Add Medication</DrawerTitle>
+          </DrawerHeader>
+          <div className="overflow-y-auto max-h-[85vh] px-4 pb-6">
+            <form onSubmit={handleSubmit} className="space-y-3">
+              <input value={name} onChange={e => setName(e.target.value)} placeholder="Medication name"
                 className="w-full bg-muted/50 rounded-xl px-3 py-2.5 text-sm focus:ring-1 focus:ring-primary/30 focus:outline-none" />
-            </div>
-            <button type="submit" disabled={!name.trim() || !dosage.trim()} className="w-full bg-primary text-primary-foreground rounded-xl py-2.5 text-sm font-medium disabled:opacity-40">
-              Save medication
-            </button>
-          </form>
-        </motion.div>
-      )}
+              <input value={drugClass} onChange={e => setDrugClass(e.target.value)} placeholder="Drug class (optional)"
+                className="w-full bg-muted/50 rounded-xl px-3 py-2.5 text-sm focus:ring-1 focus:ring-primary/30 focus:outline-none" />
+              <div className="grid grid-cols-2 gap-2">
+                <input value={dosage} onChange={e => setDosage(e.target.value)} placeholder="Dosage (e.g. 50mg)"
+                  className="bg-muted/50 rounded-xl px-3 py-2.5 text-sm focus:ring-1 focus:ring-primary/30 focus:outline-none" />
+                <input value={frequency} onChange={e => setFrequency(e.target.value)} placeholder="Frequency (e.g. daily)"
+                  className="bg-muted/50 rounded-xl px-3 py-2.5 text-sm focus:ring-1 focus:ring-primary/30 focus:outline-none" />
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Start date</label>
+                <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)}
+                  className="w-full bg-muted/50 rounded-xl px-3 py-2.5 text-sm focus:ring-1 focus:ring-primary/30 focus:outline-none" />
+              </div>
+              <button type="submit" disabled={!name.trim() || !dosage.trim()} className="w-full bg-primary text-primary-foreground rounded-xl py-2.5 text-sm font-medium disabled:opacity-40">
+                Save medication
+              </button>
+            </form>
+          </div>
+        </DrawerContent>
+      </Drawer>
 
       {/* Active */}
       <div className="space-y-2 mb-6">

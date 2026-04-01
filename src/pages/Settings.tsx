@@ -35,7 +35,7 @@ export default function SettingsPage() {
   const totalEntries = data.checkIns.length + data.symptoms.length + data.medications.length;
 
   return (
-    <div className="p-4 max-w-lg mx-auto pb-24">
+    <div className="p-4 max-w-lg mx-auto pb-[calc(6rem+env(safe-area-inset-bottom))]">
       <h1 className="text-xl font-bold text-foreground mb-6">Settings</h1>
 
       {/* Data overview */}
