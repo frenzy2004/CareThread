@@ -66,7 +66,7 @@ export default function Symptoms() {
 
   if (symptoms.length === 0 && !showForm) {
     return (
-      <div className="p-4 max-w-lg mx-auto pb-24">
+      <div className="p-4 max-w-lg mx-auto pb-[calc(6rem+env(safe-area-inset-bottom))]">
         <EmptyState
           icon="🌡️"
           title="Log your first symptom"
